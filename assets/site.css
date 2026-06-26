@@ -50,6 +50,9 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
     radial-gradient(62vw 62vw at 6% -10%,rgba(44,176,168,.22),transparent 60%),
     radial-gradient(50vw 50vw at 104% 110%,rgba(204,212,253,.12),transparent 60%),
     radial-gradient(42vw 42vw at 64% 46%,rgba(250,255,175,.05),transparent 62%)}
+/* анимированный WebGL-фон (bg.js); при активности скрываем статичные orb-градиенты */
+#bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block}
+.bg-live body::after{display:none}
 ::selection{background:var(--turquoise);color:var(--dark-green)}
 :focus-visible{outline:2px solid var(--turquoise);outline-offset:3px;border-radius:6px}
 
