@@ -1,0 +1,381 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Муж на час Кипр: позиция, план и потенциал</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#152027; --sea:#0E6E78; --sky:#1E9AA8; --sand:#F4EEE2; --paper:#FFFFFF;
+    --clay:#D9603B; --gold:#E0A23B; --plum:#7A5068; --muted:#5C6670; --line:#E4DCCC;
+    --disp:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'Space Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--sand);color:var(--ink);font-family:var(--body);line-height:1.6;font-size:16px;-webkit-text-size-adjust:100%}
+  .wrap{max-width:880px;margin:0 auto;padding:0 18px}
+  h1,h2,h3{font-family:var(--disp);font-weight:600;line-height:1.18;margin:0}
+  h2{font-size:24px;letter-spacing:-.01em}
+  h3{font-size:17px}
+  p{margin:0 0 12px}
+  a{color:var(--sea)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--clay);font-weight:700}
+  .muted{color:var(--muted)}
+  .src{font-family:var(--mono);font-size:10px;padding:1px 6px;border:1px solid var(--line);border-radius:6px;color:var(--sea);text-decoration:none;white-space:nowrap;display:inline-block;vertical-align:middle;margin-left:3px}
+
+  .hero{background:var(--ink);color:#F4EEE2;padding:42px 0 38px}
+  .hero .eyebrow{color:var(--gold)}
+  .hero h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:12px 0 12px}
+  .hero .sub{font-size:16px;color:#bcccd0}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .chip{font-family:var(--mono);font-size:11px;background:#23434a;color:#cfe3e0;padding:6px 11px;border-radius:20px}
+
+  section{padding:30px 0;border-bottom:1px solid var(--line)}
+  .lead-num{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--clay)}
+  .secsub{margin:10px 0 20px;color:#3a4750}
+
+  .grid{display:grid;gap:12px;margin-bottom:14px}
+  @media(min-width:640px){.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 17px}
+  .card h3{margin-bottom:7px}
+  .card p{font-size:14.5px}
+  .card ul{margin:6px 0 0;padding-left:18px;font-size:14.5px} .card li{margin-bottom:5px}
+
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+  .stat .n{font-family:var(--disp);font-weight:700;font-size:25px;color:var(--sea);line-height:1.05}
+  .stat .l{font-size:13px;color:var(--muted);margin-top:7px}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;border-radius:20px;font-weight:700;margin-bottom:9px}
+  .t-have{background:#dfeee9;color:#0c5346} .t-need{background:#f7e7d2;color:#7c5410} .t-key{background:#f4e0d8;color:#9a3c1d}
+
+  .callout{background:var(--sea);color:#eafafb;border-radius:16px;padding:20px 19px;margin-bottom:14px}
+  .callout .eyebrow{color:#ffd98a} .callout h3{color:#fff;font-size:19px;margin:7px 0 9px} .callout p{color:#d7f1f3;margin:0;font-size:14.5px}
+
+  .name{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+  .name span{font-family:var(--disp);font-weight:600;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 12px}
+
+  .vs{display:grid;gap:12px}
+  @media(min-width:640px){.vs{grid-template-columns:1fr 1fr}}
+  .vs .now{background:#fbf0ea;border:1px solid #eccdbf;border-radius:14px;padding:16px}
+  .vs .pot{background:#e7f3f0;border:1px solid #b9ddd4;border-radius:14px;padding:16px}
+  .vs .n{font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:8px}
+  .vs ul{margin:0;padding-left:17px;font-size:14px} .vs li{margin-bottom:5px}
+
+  /* interactive roadmap */
+  .roadhint{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:14px}
+  .roadline{display:none}
+  @media(min-width:780px){.roadline{display:flex;align-items:center;gap:8px;margin:0 0 16px}
+    .roadline .ln{flex:1;height:2px;background:#cfc6b4} .roadline .yr{font-family:var(--mono);font-size:11px;color:var(--muted)} .roadline .ar{color:#cfc6b4;font-size:14px}}
+  .phases{display:grid;gap:14px}
+  @media(min-width:780px){.phases{grid-template-columns:repeat(5,1fr);gap:10px;align-items:start}}
+  .phase-h{border-radius:12px;padding:9px 12px;color:#fff;font-family:var(--disp);font-weight:600;font-size:13.5px;margin-bottom:10px}
+  .phase-h small{display:block;font-family:var(--mono);font-size:10px;font-weight:400;opacity:.9;margin-bottom:2px}
+  .ritem{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px;cursor:pointer;font-family:var(--body);color:var(--ink);transition:border-color .15s}
+  .ritem:hover{border-color:var(--sea)}
+  .ritem .rt{font-weight:500;font-size:13.5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .ritem .chev{transition:transform .2s;color:var(--muted);font-size:11px;flex-shrink:0}
+  .ritem.open .chev{transform:rotate(180deg)}
+  .rdetail{max-height:0;overflow:hidden;transition:max-height .25s ease;font-size:13px;color:var(--muted);line-height:1.5}
+  .ritem.open .rdetail{max-height:260px;margin-top:7px}
+  @media(hover:hover) and (min-width:780px){.ritem:hover .rdetail{max-height:260px;margin-top:7px}.ritem:hover .chev{transform:rotate(180deg)}}
+
+  .src-list{font-size:13px;line-height:1.5} .src-list li{margin-bottom:6px;word-break:break-word}
+  .footnote{font-size:12px;color:var(--muted);margin-top:8px}
+  .big{font-family:var(--disp);font-weight:700;font-size:21px;color:var(--sea);margin:2px 0 4px}
+</style>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Презентация для владельцев · Кипр · до 2030</div>
+    <h1>Муж на час Кипр: где вы сейчас, план роста и потолок</h1>
+    <p class="sub">Честная позиция на рынке, понятные шаги по фазам и оценка, насколько можно вырасти.</p>
+    <div class="hero-meta">
+      <span class="chip">12 лет на рынке</span>
+      <span class="chip">6 000 клиентов в базе</span>
+      <span class="chip">5 направлений услуг</span>
+      <span class="chip">цель: RU, EN, GR</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- 01 REAL POSITION -->
+<section>
+  <div class="lead-num">01 / РЕАЛЬНАЯ ПОЗИЦИЯ НА РЫНКЕ</div>
+  <h2>Сильный нишевый игрок, почти невидимый за пределами своей ниши</h2>
+  <p class="secsub">Если честно посмотреть на сегодняшнее положение с учётом конкуренции, картина такая: вас хорошо знают по сарафану в русскоязычной среде, но в поиске, у англоязычных и в B2B вас почти нет. То есть вы конкурируете лишь на малой части рынка, на которой реально могли бы играть.</p>
+  <div class="grid g3">
+    <div class="stat"><div class="n">~1-2%</div><div class="l">оценочная доля в своей русскоязычной нише</div></div>
+    <div class="stat"><div class="n">~150</div><div class="l">заказов в год исторически (1 780 за 12 лет)</div></div>
+    <div class="stat"><div class="n">почти 0</div><div class="l">видимость в поиске на английском и в B2B</div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <span class="tag t-have">Где вы впереди конкурентов</span>
+      <ul>
+        <li>12 лет и живые видеоотзывы, такого доверия нет у частников и бирж</li>
+        <li>Несколько услуг в одном окне, узкие специалисты этого не дают</li>
+        <li>Родной язык и понятный сервис для русскоязычных</li>
+        <li>Работа по договору, оплата после приёмки, выезд за 60 минут</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag t-key">Где конкуренты вас обходят</span>
+      <ul>
+        <li>Маркетплейсы (FIX.CY, Anymaster, Bazaraki) забирают спрос охватом и выбором</li>
+        <li>Специалисты по переездам, складам, кондиционерам видны в поиске, а вы нет</li>
+        <li>Англоязычная аудитория и собственники жилья почти не знают о вас</li>
+        <li>У клиента нет цены и быстрого ответа, часть уходит к тем, кто отвечает первым</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="eyebrow">Вывод по позиции</div>
+    <h3>Проблема не в спросе, а в упаковке и охвате</h3>
+    <p>Рынок большой и растёт. Вы сильны там, где вас знают, но играете на узком поле. Рост это не поиск новых клиентов с нуля, а выход на те аудитории и каналы, где вас пока нет: поиск, англоязычные, B2B.</p>
+  </div>
+  <p class="footnote">Ключевые рыночные цифры из присланного анализа проверены по первоисточникам (CYSTAT, Eurostat, ЦБ Кипра, PwC) и подтвердились. Источники указаны рядом с числами ниже.</p>
+</section>
+
+<!-- 02 USP -->
+<section>
+  <div class="lead-num">02 / ВАШИ УТП</div>
+  <h2>Что использовать и что добавить</h2>
+  <p class="secsub">Сильные стороны вынести на первый экран. Недостающие добавить, потому что именно они открывают дорогих клиентов и B2B.</p>
+  <div class="grid g2">
+    <div class="card">
+      <span class="tag t-have">Уже есть, использовать</span>
+      <ul>
+        <li>12 лет на рынке Кипра, редкое доверие</li>
+        <li>Один подрядчик на много задач: ремонт, переезд, кондиционеры</li>
+        <li>Сервис на русском для экспатов</li>
+        <li>Договор и оплата после приёмки</li>
+        <li>Выезд за 60 минут</li>
+        <li>Видеоотзывы и Instagram как портфолио</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag t-need">Нужно добавить</span>
+      <ul>
+        <li>Цены "от" и быстрый расчёт по фото</li>
+        <li>Нативный сервис на английском и греческом, не перевод</li>
+        <li>Ответ на заявку до 5 минут</li>
+        <li>Гарантия и фотоотчёт после работ</li>
+        <li>Повторные продажи: сезонное ТО, годовые абонементы</li>
+        <li>Один менеджер и единый договор для B2B</li>
+        <li>Отзывы по каждой услуге и городу</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 03 POSITIONING & NAME -->
+<section>
+  <div class="lead-num">03 / ПОЗИЦИОНИРОВАНИЕ И НАЗВАНИЕ</div>
+  <h2>"Муж на час" не работает для англичан</h2>
+  <p class="secsub">Дословно это "husband for an hour", для англоязычных звучит странно и двусмысленно, а MujNachas не читается и ничего не значит. В русском сегменте имя за 12 лет наработало доверие, поэтому его не убираем, а строим архитектуру.</p>
+  <div class="grid g2">
+    <div class="card">
+      <span class="tag t-have">Бренд</span>
+      <h3>Мастер-бренд плюс понятные линии</h3>
+      <p class="muted">Для русских оставляем "Муж на час Кипр". Для англо и греко аудитории и для B2B вводим чистый зонтичный бренд с линиями: Move, Storage, Climate, Repair, Care.</p>
+    </div>
+    <div class="card">
+      <span class="tag t-key">Позиционирование</span>
+      <h3>Один звонок, дом под ключ</h3>
+      <p class="muted">Не "мастер на час", а оператор бытовых услуг для экспатов и собственников. Одна команда закрывает задачи по дому, на вашем языке, с договором и гарантией. RU: "Один звонок, дом под ключ". EN: "One call. Home sorted."</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:6px">Варианты названия для англо и греко витрины</h3>
+    <p class="muted" style="font-size:13.5px;margin-bottom:8px">Направления для проверки. Финал после проверки свободного домена .cy и товарного знака и короткого теста на носителях языка.</p>
+    <div class="name">
+      <span>OneHome Cyprus</span><span>Nestor Home Services</span><span>Domora</span><span>Oikos Home</span><span>Mr. Fix Cyprus</span><span>Settled Cyprus</span><span>FixHub Cyprus</span>
+    </div>
+    <p class="muted" style="font-size:13.5px;margin:0">Рекомендую короткое произносимое имя с описательной добавкой: "OneHome Cyprus" или "Nestor Home Services". "Mr. Fix" повторяет модель сильных операторов вроде Mr. Handyman.</p>
+  </div>
+</section>
+
+<!-- 04 MARKET -->
+<section>
+  <div class="lead-num">04 / РЫНОК: ПОЧЕМУ СЕЙЧАС</div>
+  <h2>Спрос растёт по нескольким причинам сразу</h2>
+  <p class="secsub">Считаем рынок от реальных драйверов: приток иностранцев, оборот недвижимости, стройка. Все три на подъёме.</p>
+  <div class="grid g3">
+    <div class="stat"><div class="n">7 255</div><div class="l">объектов куплено иностранцами в 2025, плюс 16%, 28% рынка <a class="src" href="https://cyprus-mail.com/2026/04/16/cyprus-real-estate-market-hits-record-e6-5-billion-value-in-2025">CM/PwC</a></div></div>
+    <div class="stat"><div class="n">+23,9%</div><div class="l">рост покупок жилья иностранцами в 4 кв. 2025 <a class="src" href="https://cyprus-mail.com/2026/03/19/foreign-buyers-drive-sharp-increase-in-cyprus-property-prices">ЦБ Кипра</a></div></div>
+    <div class="stat"><div class="n">8 159</div><div class="l">разрешений на стройку в 2025, плюс 19,5%, жильё плюс 42,7% <a class="src" href="https://www.gov.cy/en/economy-and-finance/building-permits-december-2025/">CYSTAT</a></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <h3>Что это значит для вас</h3>
+      <p class="muted">Каждая сделка и каждая стройка это переезд, мелкий ремонт, установка и чистка кондиционера. Пафос лидирует по иностранным покупателям, до 68% сделок за иностранцами, это рынок для англоязычной витрины. Лимассол это деловой и экспат центр. <a class="src" href="https://www.youroverseashome.com/articles/spotlight-on-the-cyprus-property-market/">источник</a></p>
+    </div>
+    <div class="card">
+      <span class="tag t-key">Поправка к анализу</span>
+      <h3>Не делать ставку на туризм</h3>
+      <p class="muted">2025 был рекордным, 4,53 млн гостей и 3,70 млрд евро <a class="src" href="https://www.gov.cy/en/economy-and-finance/tourism-statistics-2025/">CYSTAT</a>. Но в 2026 туризм падает: прибытия в марте минус 30,7%, лето примерно минус 25% <a class="src" href="https://cyprus-mail.com/2026/05/04/cyprus-tourism-faces-sharp-reversal-in-2026-after-record-breaking-year">CM</a>. Опора на жителей, собственников и B2B.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 COMPETITORS -->
+<section>
+  <div class="lead-num">05 / КОНКУРЕНТЫ</div>
+  <h2>Рынок раздроблен, и это ваш шанс</h2>
+  <p class="secsub">Сильного единого лидера нет. Три типа игроков, у каждого слабое место, которое вы закрываете.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Маркетплейсы</h3><p class="muted">FIX.CY, TipTap.cy, Erga.cy, Anymaster, Bazaraki. Дают выбор и охват, но не дают бренд, гарантию и единую ответственность.</p></div>
+    <div class="card"><h3>Узкие специалисты</h3><p class="muted">Переезды (TPC, Columbia), склады (SelfStorage.cy), кондиционеры (ZeroKlima). Сильны в одном, но клиенту нужны разные подрядчики.</p></div>
+    <div class="card"><h3>Частные мастера</h3><p class="muted">Через Facebook и объявления. Дёшево на одной задаче, но без сервиса, договора и стабильного качества.</p></div>
+  </div>
+  <div class="callout">
+    <div class="eyebrow">Как выигрывать</div>
+    <h3>Занять середину: оператор, а не биржа мастеров</h3>
+    <p>Несколько услуг под единым брендом, с понятной ценой, быстрым ответом, договором и гарантией. Это то, что маркетплейс и частник дать не могут, а узкий специалист закрывает лишь часть задач.</p>
+  </div>
+</section>
+
+<!-- 06 INTERACTIVE ROADMAP -->
+<section>
+  <div class="lead-num">06 / ПЛАН ПО ФАЗАМ</div>
+  <h2>Дорожная карта 2026 до 2030</h2>
+  <p class="secsub">Пять фаз. Сначала собираем деньги с того, что есть, потом упаковка и каналы, потом B2B и города, в конце система и тираж.</p>
+  <div class="roadhint">Наведите курсор или нажмите на пункт, чтобы раскрыть пояснение</div>
+  <div class="roadline"><span class="yr">2026</span><span class="ln"></span><span class="ar">▶</span><span class="yr">2030</span></div>
+
+  <div class="phases">
+    <div>
+      <div class="phase-h" style="background:var(--sea)"><small>Июль-Сентябрь 2026</small>Фундамент и деньги из базы</div>
+      <button class="ritem"><span class="rt">Ребрендинг<span class="chev">▼</span></span><div class="rdetail">Новый фирстиль и название. Русский народный бренд оставляем, для англо и греко аудитории вводим чистый зонтичный бренд.</div></button>
+      <button class="ritem"><span class="rt">Перезапуск сайта RU/EN<span class="chev">▼</span></span><div class="rdetail">Сайт с ценами "от", расчётом по фото и отдельными страницами по услугам и городам. Английская версия пишется нативно, а не переводится.</div></button>
+      <button class="ritem"><span class="rt">CRM и speed-to-lead<span class="chev">▼</span></span><div class="rdetail">Все заявки в одной системе, ответ клиенту до 5 минут. Часто именно скорость решает, кто получит заказ.</div></button>
+      <button class="ritem"><span class="rt">Реактивация базы 6 000<span class="chev">▼</span></span><div class="rdetail">Письма по старой базе: вернуть клиентов и продать сезонное обслуживание. Деньги почти сразу, без затрат на привлечение.</div></button>
+    </div>
+
+    <div>
+      <div class="phase-h" style="background:var(--sky)"><small>Октябрь-Декабрь 2026</small>Каналы и поток заявок</div>
+      <button class="ritem"><span class="rt">Локальное SEO<span class="chev">▼</span></span><div class="rdetail">Профили в Google и на картах по городам. Бесплатный поток из поиска, часто сильнее самого сайта.</div></button>
+      <button class="ritem"><span class="rt">Страницы услуга и город<span class="chev">▼</span></span><div class="rdetail">Десятки страниц по формуле услуга, город, язык. Каждая ловит свой запрос в поиске.</div></button>
+      <button class="ritem"><span class="rt">Реклама в поиске<span class="chev">▼</span></span><div class="rdetail">Объявления на горячие запросы: кондиционер, переезд, мастер. Быстрый поток заявок, пока SEO разгоняется.</div></button>
+      <button class="ritem"><span class="rt">Система отзывов<span class="chev">▼</span></span><div class="rdetail">Сбор отзывов после каждой работы. Отзывы по услугам и городам поднимают доверие и конверсию.</div></button>
+    </div>
+
+    <div>
+      <div class="phase-h" style="background:var(--clay)"><small>2027</small>B2B и новые города</div>
+      <button class="ritem"><span class="rt">B2B-пакеты<span class="chev">▼</span></span><div class="rdetail">Пакеты для управляющих компаний и риелторов. Один договор даёт десятки заказов в месяц без затрат на привлечение.</div></button>
+      <button class="ritem"><span class="rt">Стандарты сроков (SLA)<span class="chev">▼</span></span><div class="rdetail">Гарантированные сроки и качество. Для бизнеса это обязательное условие сотрудничества.</div></button>
+      <button class="ritem"><span class="rt">Пафос и Никосия<span class="chev">▼</span></span><div class="rdetail">Пафос как англоязычный рынок с большой долей иностранцев, Никосия как крупнейшая база домохозяйств.</div></button>
+    </div>
+
+    <div>
+      <div class="phase-h" style="background:var(--plum)"><small>2028-2029</small>Система и масштаб</div>
+      <button class="ritem"><span class="rt">Бригады по городам<span class="chev">▼</span></span><div class="rdetail">Отдельные команды и диспетчер в каждом городе. Рост без потери качества.</div></button>
+      <button class="ritem"><span class="rt">Тираж модели города<span class="chev">▼</span></span><div class="rdetail">Готовый стандарт работы города, по которому можно открывать новые точки или мягкую франшизу.</div></button>
+      <button class="ritem"><span class="rt">Автоматизация и AI<span class="chev">▼</span></span><div class="rdetail">AI сортирует заявки, переводит RU, EN, GR и помогает оценивать работы по фото. Меньше ручной работы, выше скорость.</div></button>
+    </div>
+
+    <div>
+      <div class="phase-h" style="background:#5d4422"><small>2030</small>Платформа и тираж</div>
+      <button class="ritem"><span class="rt">Платформизация<span class="chev">▼</span></span><div class="rdetail">Единая система приёма и распределения заявок. Бизнес работает как платформа, а не как одна бригада.</div></button>
+      <button class="ritem"><span class="rt">White-label и экспорт<span class="chev">▼</span></span><div class="rdetail">Сервис под брендом партнёров, управляющих и застройщиков. Возможный выход на другой рынок с большой долей экспатов.</div></button>
+    </div>
+  </div>
+</section>
+
+<!-- 07 RISKS -->
+<section>
+  <div class="lead-num">07 / РИСКИ</div>
+  <h2>Что может помешать и как снять</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Размытое позиционирование</h3><p class="muted">Клиент не понимает, кто вы. Решение: единый бренд и понятные линии услуг.</p></div>
+    <div class="card"><h3>Всё держится на одном человеке</h3><p class="muted">Решение: CRM, регламенты, диспетчер, скрипты.</p></div>
+    <div class="card"><h3>Неровное качество при росте</h3><p class="muted">Решение: рейтинг подрядчиков, фотоконтроль, отбор перед публикацией отзыва.</p></div>
+    <div class="card"><h3>Зависимость от Instagram и WhatsApp</h3><p class="muted">Решение: добавить SEO, поиск, email и локальные каталоги.</p></div>
+    <div class="card"><h3>Слабый туризм в 2026</h3><p class="muted">Решение: опора на жителей, собственников и B2B. <a class="src" href="https://cyprus-mail.com/2026/05/04/cyprus-tourism-faces-sharp-reversal-in-2026-after-record-breaking-year">CM</a></p></div>
+    <div class="card"><h3>Рост стоимости труда</h3><p class="muted">Решение: маршрутизация, допродажи, пакеты с большей ценностью.</p></div>
+  </div>
+</section>
+
+<!-- 08 FIRST STEPS -->
+<section>
+  <div class="lead-num">08 / С ЧЕГО НАЧАТЬ НА ЭТОЙ НЕДЕЛЕ</div>
+  <h2>Четыре действия с быстрой отдачей</h2>
+  <div class="grid g2">
+    <div class="card"><h3>1. Включить CRM и пиксели</h3><p class="muted">Чтобы перестать терять заявки и собирать аудиторию для рекламы.</p></div>
+    <div class="card"><h3>2. Написать базе 6 000</h3><p class="muted">Реактивация и предложение сезонного ТО. Деньги уже на этой неделе.</p></div>
+    <div class="card"><h3>3. Запустить сбор отзывов на Google</h3><p class="muted">Просить отзыв после каждой работы. Дёшево, сильно влияет на доверие и поиск.</p></div>
+    <div class="card"><h3>4. Завести Google профили по городам</h3><p class="muted">Бесплатный поток из локального поиска.</p></div>
+  </div>
+</section>
+
+<!-- 09 GROWTH POTENTIAL FINALE -->
+<section style="border-bottom:none">
+  <div class="lead-num">09 / НАСКОЛЬКО МОЖНО ВЫРАСТИ</div>
+  <h2>Потолок в разы выше текущего</h2>
+  <p class="secsub">Точную выручку прогнозировать некорректно, мы её не знаем. Но видно, что рост измеряется не процентами, а кратностью. Причина простая: один клиент способен давать 2 до 6 обращений в год по разным услугам, а вы пока работаете на узком поле.</p>
+
+  <div class="vs" style="margin-bottom:16px">
+    <div class="now">
+      <div class="n">Сейчас</div>
+      <ul>
+        <li>~150 заказов в год</li>
+        <li>В основном русскоязычные арендаторы</li>
+        <li>Один город, одна команда</li>
+        <li>Разовые заказы, мало повторных</li>
+        <li>Заявки сырые, много ручной работы</li>
+      </ul>
+    </div>
+    <div class="pot">
+      <div class="n">Потенциал к 2030</div>
+      <ul>
+        <li>Тысячи заказов в год</li>
+        <li>Три аудитории: русские, англоязычные, B2B</li>
+        <li>Несколько городов, отдельные бригады</li>
+        <li>Повторные продажи и абонементы как ядро дохода</li>
+        <li>CRM и быстрый ответ, заявки квалифицированы</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid g3">
+    <div class="stat"><div class="big">x3</div><div class="l">аудитории: к русским добавляются англоязычные и B2B</div></div>
+    <div class="stat"><div class="big">x4</div><div class="l">география: от одного города к четырём ключевым</div></div>
+    <div class="stat"><div class="big">x2-6</div><div class="l">обращений с одного клиента в год за счёт повторных продаж</div></div>
+  </div>
+
+  <div class="callout">
+    <div class="eyebrow">Главное</div>
+    <h3>Ограничитель это не рынок, а исполнение</h3>
+    <p>Спрос есть, и он растёт. Кратный рост реален в горизонте до 2030, если довести до конца упаковку, каналы, B2B и систему. Минимум усилий оставит вас на медленном органическом росте. Полная программа из этого плана даёт рост в разы. Узкое место при этом не заявки, а руки и стандарты, поэтому найм и регламенты так важны в средних фазах.</p>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section style="border-bottom:none;padding-top:6px">
+  <div class="lead-num">ИСТОЧНИКИ</div>
+  <ul class="src-list muted">
+    <li>Туризм 2025: 4,53 млн прибытий, 3,70 млрд евро, плюс 15,2%. CYSTAT, gov.cy/tourism-statistics-2025</li>
+    <li>Падение туризма 2026: Cyprus Mail, 04.05.2026</li>
+    <li>Стройка 2025: 8 159 разрешений, плюс 19,5%, жилые единицы плюс 42,7%. CYSTAT, gov.cy/building-permits-december-2025</li>
+    <li>Недвижимость 2025: 7 255 объектов иностранцам, плюс 16%, рынок 6,5 млрд евро. PwC через Cyprus Mail и Politis</li>
+    <li>4 кв. 2025: сделки плюс 18,7%, иностранцы плюс 23,9%. Центральный банк Кипра через Cyprus Mail</li>
+    <li>Население: рождены за рубежом 27,6%, неграждане 24,8%. Eurostat, 01.01.2025</li>
+    <li>Россияне крупнейшая община экспатов, около 40 600. Cyprus Mail, 12.11.2025</li>
+    <li>Перепись 2021: население 923 381. CYSTAT</li>
+  </ul>
+  <p class="footnote">Часть цифр взята из присланного анализа и перепроверена по первоисточникам. Финансовые сценарии исходного документа считаю ориентиром, а не прогнозом, потому что фактическая выручка и себестоимость неизвестны.</p>
+</section>
+
+</div>
+
+<script>
+document.querySelectorAll('.ritem').forEach(function(b){
+  b.setAttribute('type','button');
+  b.setAttribute('aria-expanded','false');
+  b.addEventListener('click',function(){
+    var open=b.classList.toggle('open');
+    b.setAttribute('aria-expanded',open?'true':'false');
+  });
+});
+</script>
