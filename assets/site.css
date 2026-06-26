@@ -50,9 +50,17 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
     radial-gradient(62vw 62vw at 6% -10%,rgba(44,176,168,.22),transparent 60%),
     radial-gradient(50vw 50vw at 104% 110%,rgba(204,212,253,.12),transparent 60%),
     radial-gradient(42vw 42vw at 64% 46%,rgba(250,255,175,.05),transparent 62%)}
-/* анимированный WebGL-фон (bg.js); при активности скрываем статичные orb-градиенты */
+/* анимированный WebGL-фон (bg.js) — только на странице входа;
+   при активности скрываем статичные orb-градиенты */
 #bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block}
 .bg-live body::after{display:none}
+/* контентные страницы: чередуем фоновые слои ДС (ambient orbs ↔ dot-grid) */
+#app section,#app .dir{position:relative}
+#app section:nth-of-type(even)::before,#app .dir:nth-of-type(even)::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.6;
+  background:radial-gradient(circle,rgba(44,176,168,.10) 1px,transparent 1px);background-size:24px 24px;
+  -webkit-mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent);
+  mask-image:linear-gradient(transparent,#000 22%,#000 78%,transparent)}
 ::selection{background:var(--turquoise);color:var(--dark-green)}
 :focus-visible{outline:2px solid var(--turquoise);outline-offset:3px;border-radius:6px}
 
@@ -304,4 +312,39 @@ footer a{color:var(--turquoise);border:0}
   ul.links li .size{text-align:left}
   .plat .links a{display:block;margin:4px 0 0}
   section{padding:30px 0}
+}
+
+/* ============ PRINT / PDF ============ */
+@media print{
+  @page{margin:14mm}
+  html,body{background:#fff!important;color:#15211c!important}
+  body::before,body::after,#bgfx,.brandbar,.gate-controls,#gate,.roadhint,.roadline{display:none!important}
+  #app{display:block!important}
+  #app section::before,#app .dir::before{display:none!important}
+  .hero{padding:0 0 10pt!important;overflow:visible}
+  .hero h1{-webkit-text-fill-color:#0c3b38!important;color:#0c3b38!important;background:none!important}
+  h1,h2,h3,.stat .n,.stat .big,.big,.vs .n{color:#0c3b38!important}
+  .eyebrow,.lead-num,.tier,.num,.verdict,.rc-eyebrow,.hero .eyebrow{color:#0a7d73!important}
+  p,.muted,.secsub,.sub,.card p,.card ul,.plat p,.note,ul.links li .note,.kv span,.rdetail,.footnote,.src-list{color:#33403a!important}
+  .kv b{color:#15211c!important}
+  .card,.stat,.plat,ul.links li,.pay,.vs .now,.vs .pot,.ritem,.name span,.note-strip,.rcard{
+    background:#fff!important;border:1px solid #d4ddd9!important;box-shadow:none!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;transform:none!important}
+  .callout{background:#eef7f5!important;border:1px solid #bfe0d9!important;box-shadow:none!important}
+  .callout h3,.callout p,.callout .eyebrow{color:#0c3b38!important}
+  .chip,.tag,.rc-tags span,.src{background:#eef7f5!important;color:#0a7d73!important;border:1px solid #bfe0d9!important}
+  .t-key{background:#0a7d73!important;color:#fff!important}
+  a{color:#0a7d73!important}
+  /* раскрываем все «гармошки» (роадмап, каналы, ссылки) */
+  .rdetail{max-height:none!important;margin-top:6px!important;overflow:visible!important}
+  .ritem .chev{display:none!important}
+  .phase-h{color:#fff!important}
+  .phases{grid-template-columns:repeat(2,1fr)!important}
+  /* убираем анимационные скрытые состояния */
+  .split .i{transform:none!important;opacity:1!important;filter:none!important}
+  [data-reveal]{opacity:1!important;transform:none!important}
+  /* разрывы страниц */
+  section{break-inside:auto;border-color:#e3e8e6!important;padding:8pt 0!important}
+  .card,.callout,.stat,.plat,ul.links li,.ritem,.vs>div{break-inside:avoid}
+  h2,h3{break-after:avoid}
 }

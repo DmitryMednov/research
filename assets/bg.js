@@ -117,7 +117,18 @@
   raf = requestAnimationFrame(frame);
 
   document.addEventListener('visibilitychange', function () {
+    if (stopped) return;
     if (document.hidden) { running = false; cancelAnimationFrame(raf); }
     else if (!running) { running = true; t0 = null; raf = requestAnimationFrame(frame); }
   });
+
+  /* остановить и убрать шейдер (вызывается при входе в контент —
+     фон-анимация живёт только на странице входа) */
+  var stopped = false;
+  window.__BG = { stop: function () {
+    if (stopped) return; stopped = true; running = false;
+    cancelAnimationFrame(raf);
+    if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
+    document.documentElement.classList.remove('bg-live');
+  } };
 })();

@@ -64,6 +64,7 @@
     app.hidden = false;
     var gate = document.getElementById('gate');
     if (gate) gate.style.display = 'none';
+    if (window.__BG) window.__BG.stop();   // анимированный фон — только на входе
     injectControls(id);
     if (window.RAnim) window.RAnim.run(app);
     window.scrollTo(0, 0);
@@ -83,23 +84,34 @@
     }
     // чистим прежние служебные кнопки
     host.querySelectorAll('[data-vault-ctl]').forEach(function (n) { n.remove(); });
-    if (hasHub && id !== 'hub') {
-      var back = document.createElement('button');
-      back.type = 'button'; back.className = 'gate-logout'; back.dataset.vaultCtl = '1'; back.dataset.back = '1';
-      back.textContent = '← Витрина';
-      host.appendChild(back);
+    function ctl(attr, text) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'gate-logout'; b.dataset.vaultCtl = '1';
+      b.setAttribute(attr, '1'); b.textContent = text;
+      host.appendChild(b); return b;
     }
-    var out = document.createElement('button');
-    out.type = 'button'; out.className = 'gate-logout'; out.dataset.vaultCtl = '1'; out.dataset.logout = '1';
-    out.textContent = 'Выйти';
-    host.appendChild(out);
+    if (hasHub && id !== 'hub') ctl('data-back', '← Витрина');
+    if (id !== 'hub') ctl('data-pdf', '↓ PDF');   // PDF для каждого исследования
+    ctl('data-logout', 'Выйти');
+  }
+
+  /* печать активного исследования в PDF (через диалог браузера «Сохранить как PDF») */
+  function downloadPDF() {
+    var app = document.getElementById('app');
+    var h1 = app.querySelector('h1');
+    var prev = document.title;
+    if (h1) document.title = h1.textContent.trim().replace(/\s+/g, ' ');
+    function restore() { document.title = prev; window.removeEventListener('afterprint', restore); }
+    window.addEventListener('afterprint', restore);
+    window.print();
   }
 
   /* --- делегирование кликов внутри контента --- */
   document.addEventListener('click', function (ev) {
-    var t = ev.target.closest('[data-logout],[data-back],[data-scn]');
+    var t = ev.target.closest('[data-logout],[data-back],[data-pdf],[data-scn]');
     if (!t) return;
     if (t.hasAttribute('data-logout')) { ev.preventDefault(); location.reload(); return; }
+    if (t.hasAttribute('data-pdf')) { ev.preventDefault(); downloadPDF(); return; }
     if (t.hasAttribute('data-back')) { ev.preventDefault(); reveal('hub'); return; }
     if (t.hasAttribute('data-scn')) {
       var id = t.getAttribute('data-scn');
