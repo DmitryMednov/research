@@ -42,6 +42,8 @@
     var heads = root.querySelectorAll('h1, h2, [data-split]');
     heads.forEach(function (h) {
       if (h.closest('.brandbar') || h.closest('.gatecard')) return;
+      // градиентный заголовок hero не дробим — проявляем целиком
+      if (h.closest('.hero')) { if (!h.hasAttribute('data-reveal')) h.setAttribute('data-reveal', ''); return; }
       splitHeading(h);
     });
     if (reduce || !('IntersectionObserver' in window)) {

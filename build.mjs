@@ -100,7 +100,7 @@ function shell(manifestJson) {
 <title>Research</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
@@ -108,10 +108,9 @@ function shell(manifestJson) {
 
 <div id="gate" class="gatewrap">
   <form id="gateform" class="gatecard" autocomplete="off">
-    <!-- ЛОГОТИП: заглушка до присланной дизайн-системы -->
-    <div class="gate-logo" aria-label="Research">
-      <span class="gate-logo-mark"></span>
-      <span class="gate-logo-word">Research</span>
+    <div class="gate-logo" aria-label="Mednov Family Office">
+      <svg viewBox="0 0 150.34 98.048" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.246 0H0V98.048H19.246V40.0158C24.5963 42.624 30.496 43.2228 35.4998 43.2228H43.6043V98.048H62.8503V43.2228H66.1564C72.2529 43.2228 77.8025 45.7263 81.8317 49.7593C85.861 53.7922 88.3623 59.3471 88.3623 65.4489V98.048H108.101V65.4489C108.101 53.8935 103.385 43.3952 95.7877 35.7906C88.19 28.1861 77.7015 23.4657 66.1564 23.4657H35.469C31.3423 23.4657 19.246 19.9774 19.246 6.85762V0Z" fill="#2CB0A8"/><path d="M136.251 97.8169C144.032 97.8169 150.34 91.5033 150.34 83.715C150.34 75.9268 144.032 69.6131 136.251 69.6131C128.47 69.6131 122.162 75.9268 122.162 83.715C122.162 91.5033 128.47 97.8169 136.251 97.8169Z" fill="#2CB0A8"/></svg>
+      <span class="gate-logo-word">Family Office</span>
     </div>
     <div class="gate-fields">
       <input id="gate-login" type="text" placeholder="Логин" aria-label="Логин" autocapitalize="off" autocorrect="off" spellcheck="false">
