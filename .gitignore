@@ -1,0 +1,11 @@
+# Исходники в открытом виде и пароли — НЕ публикуем и НЕ коммитим.
+# Восстанавливаются из зашифрованных страниц: node build.mjs decrypt
+_src/
+
+# build deps
+node_modules/
+package.json
+package-lock.json
+
+# локальные проверки
+scratch-*
