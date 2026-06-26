@@ -30,29 +30,30 @@
     return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(obj.iv) }, key, unb64(obj.ct)));
   }
 
-  /* --- попытка входа: вернёт landing id или null --- */
+  /* --- попытка входа: {landing} | {expired:true} | null --- */
   async function tryLogin(login, password) {
     var pass = login.toLowerCase().trim() + '\n' + password;
+    var expiredHit = false;
     for (var r = 0; r < V.rcp.length; r++) {
       var entry = V.rcp[r];
       var kek;
       try { kek = await kdf(pass, unb64(entry.salt)); } catch (e) { continue; }
-      var got = {}, landing = null, ok = false;
+      var got = {}, landing = null, ok = false, matched = false;
       for (var id in entry.w) {
+        if (id.indexOf('__') === 0) continue; // служебные обёртки (напр. __cfg)
         try {
           var wrap = JSON.parse(dec.decode(await gcmDec(kek, entry.w[id])));
+          matched = true;
+          if (wrap.exp && Date.now() > wrap.exp) continue; // срок доступа истёк
           got[id] = await rawKey(unb64(wrap.k));
           if (wrap.l) landing = id;
           ok = true;
         } catch (e) { /* не этот получатель */ }
       }
-      if (ok) {
-        unlocked = got;
-        hasHub = !!got.hub;
-        return landing || Object.keys(got)[0];
-      }
+      if (ok) { unlocked = got; hasHub = !!got.hub; return { landing: landing || Object.keys(got)[0] }; }
+      if (matched) expiredHit = true; // ключ подошёл, но доступ истёк
     }
-    return null;
+    return expiredHit ? { expired: true } : null;
   }
 
   /* --- расшифровать и показать сценарий на месте --- */
@@ -131,11 +132,12 @@
       ev.preventDefault();
       if (!login.value || !pass.value) return;
       err.hidden = true; btn.disabled = true; btn.textContent = 'Проверяю…';
-      var landing = null;
-      try { landing = await tryLogin(login.value, pass.value); } catch (e) { landing = null; }
-      if (landing) {
-        await reveal(landing);
+      var res = null;
+      try { res = await tryLogin(login.value, pass.value); } catch (e) { res = null; }
+      if (res && res.landing) {
+        await reveal(res.landing);
       } else {
+        err.textContent = (res && res.expired) ? 'Срок доступа истёк' : 'Неверный логин или пароль';
         err.hidden = false; btn.disabled = false; btn.textContent = 'Войти';
         pass.value = ''; pass.focus();
         form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
