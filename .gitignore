@@ -2,6 +2,9 @@
 # Восстанавливаются из зашифрованных страниц: node build.mjs decrypt
 _src/
 
+# Access-версия (открытый текст для Cloudflare Pages за Access) — не коммитим
+_site/
+
 # build deps
 node_modules/
 package.json

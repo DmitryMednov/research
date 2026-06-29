@@ -226,6 +226,65 @@ async function buildDecrypt() {
   console.error('Не удалось расшифровать паролями из _src/secrets.json');
 }
 
+/* ---- Access-версия: статичные пер-статейные страницы (Cloudflare Pages + Access) ----
+   Открытый текст (Access защищает на входе). В _site/ — самодостаточный
+   деплой-каталог. В публичный репозиторий НЕ коммитится (.gitignore). */
+async function buildSite() {
+  const out = path.join(ROOT, '_site');
+  fs.rmSync(out, { recursive: true, force: true });
+  fs.mkdirSync(path.join(out, 'assets'), { recursive: true });
+  for (const f of ['site.css', 'anim.js', 'logo-mark.svg', 'logo-mark-white.svg']) {
+    var s = path.join(ROOT, 'assets', f); if (fs.existsSync(s)) fs.copyFileSync(s, path.join(out, 'assets', f));
+  }
+  const SLUG = {}; for (const id in SCENARIOS) SLUG[id] = id === 'hub' ? '' : path.basename(SCENARIOS[id].src, '.html');
+  function page(title, assets, bodyInner) {
+    return `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>${title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${assets}/site.css">
+</head>
+<body>
+<div id="app">
+${bodyInner}
+</div>
+<script src="${assets}/anim.js" defer></script>
+</body>
+</html>
+`;
+  }
+  for (const [id, cfg] of Object.entries(SCENARIOS)) {
+    const file = path.join(ROOT, cfg.src); if (!fs.existsSync(file)) continue;
+    const raw = fs.readFileSync(file, 'utf8');
+    let body = parseBody(raw);
+    const sub = id !== 'hub'; const assets = sub ? '../assets' : 'assets';
+    if (id === 'hub') {
+      // карточки-кнопки -> ссылки на статьи
+      body = body.replace(/<button class="rcard" data-scn="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g,
+        (m, scn, inner) => `<a class="rcard" href="${SLUG[scn] ? SLUG[scn] + '/' : '#'}">${inner}</a>`);
+    } else {
+      const controls = `<a class="gate-logout" href="../">← Все исследования</a>` +
+        `<button class="gate-logout" type="button" onclick="window.print()">↓ PDF</button>`;
+      // встраиваем управление в шапку (вместо тега), иначе — фиксированной плашкой
+      if (/<span class="tag">[\s\S]*?<\/span>/.test(body)) body = body.replace(/<span class="tag">[\s\S]*?<\/span>/, controls);
+      else body = `<div class="gate-controls">${controls}</div>\n` + body;
+    }
+    const dir = id === 'hub' ? out : path.join(out, SLUG[id]);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), page(parseTitle(raw) || id, assets, body));
+    console.log('✓ site:', path.relative(ROOT, path.join(dir, 'index.html')), sub ? '(Access app: /' + SLUG[id] + '/*)' : '(hub)');
+  }
+  console.log('\nГотово: _site/ — открытый текст для Cloudflare Pages за Access (в git не попадает).');
+  console.log('Пути для Access-приложений:', Object.keys(SCENARIOS).filter(i => i !== 'hub').map(i => '/' + SLUG[i] + '/*').join(', '));
+}
+
 const mode = process.argv[2] || 'encrypt';
 if (mode === 'decrypt') await buildDecrypt();
+else if (mode === 'site') await buildSite();
 else await buildEncrypt();
