@@ -93,7 +93,9 @@ a:hover{color:var(--white)}
 /* ============ BRANDBAR / NAV ============ */
 .brandbar{position:sticky;top:0;z-index:40;background:rgba(10,26,25,.55);
   -webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border-bottom:1px solid var(--border-hairline)}
-.brandbar .row{max-width:var(--wrap);margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brandbar .row{max-width:var(--wrap);margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brandbar .row>.links,.brandbar .row>.nav-actions{margin-left:auto;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.brandbar .row .gate-logout{margin-left:0}
 .wordmark{display:inline-flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:1rem;color:var(--white);border:0}
 .wordmark::before{content:"";width:24px;height:16px;background:url(logo-mark.svg) left center/contain no-repeat;display:inline-block;flex:none}
 .wordmark .dot{display:none}
@@ -316,7 +318,7 @@ footer a{color:var(--turquoise);border:0}
 
 /* ============ ADMIN ============ */
 #adminapp{padding:28px 0 80px}
-.adm-head{display:flex;align-items:center;gap:14px;margin:6px 0 22px}
+.adm-head{display:flex;align-items:center;gap:14px;margin:6px 0 22px;flex-wrap:wrap}
 .adm-head h2{margin-right:auto}
 .btn-turq{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:800;
   padding:11px 18px;border:0;border-radius:var(--radius-pill);background:var(--turquoise);color:var(--dark-green);cursor:pointer;
@@ -329,9 +331,10 @@ footer a{color:var(--turquoise);border:0}
 .adm-in{font-family:var(--body);font-size:.95rem;padding:10px 13px;border:1px solid var(--border-strong);border-radius:11px;
   background:rgba(255,255,255,.05);color:var(--white);outline:none;transition:border-color .18s,box-shadow .18s}
 .adm-in:focus{border-color:var(--turquoise);box-shadow:0 0 0 3px var(--turquoise-25)}
-.adm-row .adm-in{flex:1;min-width:160px}
+.adm-row .adm-in{flex:1;min-width:140px}
 .adm-sel{flex:none;min-width:120px}
-select.adm-in{appearance:auto}
+select.adm-in{appearance:auto;max-width:100%}
+.adm-field>.adm-sel{width:100%}
 select.adm-in option{background:var(--deep-green);color:var(--white)}
 .adm-del{font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
   background:transparent;border:1px solid rgba(255,120,90,.4);color:#ff9c84;padding:9px 13px;border-radius:var(--radius-pill);cursor:pointer}

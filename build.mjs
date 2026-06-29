@@ -301,8 +301,8 @@ ${bodyInner}
       body = body.replace(/<button class="rcard" data-scn="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g,
         (m, scn, inner) => `<a class="rcard" href="${SLUG[scn] ? SLUG[scn] + '/' : '#'}">${inner}</a>`);
     } else {
-      const controls = `<a class="gate-logout" href="../">← Все исследования</a>` +
-        `<button class="gate-logout" type="button" onclick="window.print()">↓ PDF</button>`;
+      const controls = `<span class="nav-actions"><a class="gate-logout" href="../">← Все исследования</a>` +
+        `<button class="gate-logout" type="button" onclick="window.print()">↓ PDF</button></span>`;
       // встраиваем управление в шапку (вместо тега), иначе — фиксированной плашкой
       if (/<span class="tag">[\s\S]*?<\/span>/.test(body)) body = body.replace(/<span class="tag">[\s\S]*?<\/span>/, controls);
       else body = `<div class="gate-controls">${controls}</div>\n` + body;

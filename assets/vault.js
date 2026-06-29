@@ -77,7 +77,8 @@
     var row = app.querySelector('.brandbar .row');
     var host;
     if (row) {
-      host = row.querySelector('.links') || row;
+      host = row.querySelector('.links') || row.querySelector('.nav-actions');
+      if (!host) { host = document.createElement('span'); host.className = 'nav-actions'; row.appendChild(host); }
     } else {
       host = document.createElement('div');
       host.className = 'gate-controls';
