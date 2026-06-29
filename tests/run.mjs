@@ -126,11 +126,11 @@ test('вход (пароли): есть поля логина и пароля', 
   assert(await page.$('#gate-pass'), 'нет поля пароля');
   await ctx.close();
 });
-test('admin → витрина «Исследования» + 2 карточки', async () => {
+test('admin → витрина «Исследования» + 3 карточки', async () => {
   const { ctx, page } = await open();
   await loginPw(page, 'admin', CREDS.admin);
   assert(await txt(page, 'Исследования'), 'нет витрины');
-  assert((await page.$$('[data-scn]')).length === 2, 'не 2 карточки');
+  assert((await page.$$('[data-scn]')).length === 3, 'не 3 карточки');
   assert(page._errs.length === 0, 'JS-ошибки: ' + page._errs);
   await ctx.close();
 });

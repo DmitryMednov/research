@@ -39,6 +39,7 @@ const SCENARIOS = {
   hub: { src: '_src/hub.html',          kicker: 'Витрина',      kind: 'hub' },
   r1:  { src: '_src/muzh-na-chas.html', kicker: 'Исследование', kind: 'research' },
   r2:  { src: '_src/samui.html',        kicker: 'Исследование', kind: 'research' },
+  r3:  { src: '_src/agro.html',         kicker: 'Исследование', kind: 'research' },
 };
 
 /* ---- пользователи по умолчанию (bootstrap, если нет cfg) ---- */
@@ -228,6 +229,9 @@ async function buildEncrypt() {
   let users = await loadExistingUsers(secrets);
   if (users) console.log('Пользователи взяты из текущего index.html (cfg).');
   else { users = attachBootstrapPasswords(BOOTSTRAP_USERS, secrets); console.log('Пользователи: bootstrap из _src/secrets.json.'); }
+  // админы всегда видят все сценарии (в т.ч. только что добавленные)
+  const allIds = Object.keys(SCENARIOS);
+  users = users.map(u => u.role === 'admin' ? { ...u, scenarios: allIds.slice(), landing: 'hub' } : u);
 
   const { manifest, openObj } = await buildManifest(users);
   fs.writeFileSync(path.join(ROOT, 'index.html'), shell(JSON.stringify(manifest), openObj));
