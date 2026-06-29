@@ -93,7 +93,6 @@
       host.appendChild(b); return b;
     }
     if (hasHub && id !== 'hub') ctl('data-back', '← Витрина');
-    if (id !== 'hub') ctl('data-pdf', '↓ PDF');   // PDF для каждого исследования
     ctl('data-logout', 'Выйти');
   }
 
@@ -110,11 +109,17 @@
 
   /* --- делегирование кликов внутри контента --- */
   document.addEventListener('click', function (ev) {
-    var t = ev.target.closest('[data-logout],[data-back],[data-pdf],[data-scn]');
+    var t = ev.target.closest('[data-logout],[data-back],[data-pdf-scn],[data-scn]');
     if (!t) return;
     if (t.hasAttribute('data-logout')) { ev.preventDefault(); location.reload(); return; }
-    if (t.hasAttribute('data-pdf')) { ev.preventDefault(); downloadPDF(); return; }
     if (t.hasAttribute('data-back')) { ev.preventDefault(); reveal('hub'); return; }
+    if (t.hasAttribute('data-pdf-scn')) {
+      // PDF прямо с карточки: открываем исследование и запускаем печать
+      ev.preventDefault();
+      var pid = t.getAttribute('data-pdf-scn');
+      if (unlocked[pid]) reveal(pid).then(function () { setTimeout(downloadPDF, 450); });
+      return;
+    }
     if (t.hasAttribute('data-scn')) {
       var id = t.getAttribute('data-scn');
       if (unlocked[id]) { ev.preventDefault(); reveal(id); }

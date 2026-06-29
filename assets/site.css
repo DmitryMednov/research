@@ -234,8 +234,8 @@ ul.links li .note{grid-column:1 / -1;font-size:.82rem;color:var(--text-muted)}
 
 .rgrid{display:grid;gap:16px}
 @media(min-width:680px){.rgrid{grid-template-columns:1fr 1fr}}
-.rcard{position:relative;overflow:hidden;display:flex;flex-direction:column;text-align:left;width:100%;cursor:pointer;
-  padding:24px 24px 20px;color:var(--white);min-height:184px;
+.rcard{position:relative;overflow:hidden;display:flex;flex-direction:column;text-align:left;width:100%;
+  padding:24px 24px 6px;color:var(--white);min-height:184px;
   transition:transform .4s var(--ease-spring),background .4s var(--ease),border-color .4s,box-shadow .4s}
 .rcard::before{content:"";position:absolute;inset:0;pointer-events:none;background:var(--glass-highlight)}
 .rcard:hover{transform:translateY(-8px);background:rgba(44,176,168,.11);border-color:var(--border-strong);box-shadow:var(--shadow-card-hover),var(--glass-rim)}
@@ -245,10 +245,18 @@ ul.links li .note{grid-column:1 / -1;font-size:.82rem;color:var(--text-muted)}
 .rcard .rc-tags{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .rcard .rc-tags span{font-family:var(--mono);font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;
   background:var(--turquoise-08);border:1px solid var(--border-accent);color:var(--turquoise);padding:4px 9px;border-radius:var(--radius-pill)}
-.rcard .rc-go{position:relative;z-index:1;margin-top:auto;padding-top:16px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--turquoise);display:inline-flex;align-items:center;gap:7px;font-weight:700}
-.rcard .rc-go .arr{transition:transform .3s var(--ease)}
-.rcard:hover .rc-go .arr{transform:translateX(5px)}
+/* нижняя плашка карточки: «Открыть» | «PDF» */
+.rcard .rc-actions{position:relative;z-index:1;margin-top:auto;display:flex;align-items:stretch;
+  border-top:1px solid var(--border-hairline);margin-left:-24px;margin-right:-24px;padding:0 8px}
+.rcard .rc-open,.rcard .rc-pdf{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+  background:transparent;border:0;cursor:pointer;color:var(--turquoise);padding:15px 16px;display:inline-flex;align-items:center;gap:7px;
+  transition:color .2s,background .2s}
+.rcard .rc-open{flex:1}
+.rcard .rc-pdf{flex:none;color:var(--text-secondary);border-left:1px solid var(--border-hairline)}
+.rcard .rc-open:hover{color:var(--white)}
+.rcard .rc-pdf:hover{color:var(--white);background:var(--turquoise-08)}
+.rcard .rc-open .arr{transition:transform .3s var(--ease)}
+.rcard .rc-open:hover .arr{transform:translateX(5px)}
 
 .note-strip{background:var(--turquoise-08);border:1px solid var(--border-accent);border-radius:var(--radius-md);padding:14px 16px;
   font-size:.88rem;color:var(--text-secondary);display:flex;gap:10px;align-items:flex-start}
@@ -359,6 +367,14 @@ select.adm-in option{background:var(--deep-green);color:var(--white)}
 .adm-status.err{color:#ff9c84}
 .adm-summary{font-family:var(--mono);font-size:.74rem;color:var(--text-secondary);white-space:pre-wrap;word-break:break-word;
   background:rgba(0,0,0,.25);border:1px solid var(--border-hairline);border-radius:10px;padding:12px;margin:4px 0 0}
+
+/* ============ ВЕРТИКАЛЬНЫЙ РИТМ (отступы между блоками) ============ */
+.lead-num{display:block;margin-bottom:9px}
+section > .card,section > .callout,section > .note-strip,section > .pay,section > .disc,
+section > .name,section > .vs,section > .phases,section > .plat,section > ul.links,section > .grid{margin-bottom:14px}
+.grid > *,.rgrid > *,.vs > *,.phases > *{margin-bottom:0}
+h2 + .grid,h2 + .vs,h2 + .phases,h2 + .callout,h2 + .card,h2 + .pay,h2 + ul.links,h2 + .roadhint,h2 + .tier{margin-top:16px}
+section > :last-child{margin-bottom:0}
 
 /* ============ PRINT / PDF ============ */
 @media print{

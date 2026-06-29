@@ -40,7 +40,13 @@ const SCENARIOS = {
   r1:  { src: '_src/muzh-na-chas.html', kicker: 'Исследование', kind: 'research' },
   r2:  { src: '_src/samui.html',        kicker: 'Исследование', kind: 'research' },
   r3:  { src: '_src/agro.html',         kicker: 'Исследование', kind: 'research' },
+  r4:  { src: '_src/photonics.html',    kicker: 'Исследование', kind: 'research' },
+  r5:  { src: '_src/energy.html',       kicker: 'Исследование', kind: 'research' },
 };
+
+/* дата сборки для подстановки в {{DATE}} (реальная дата обновления) */
+const BUILD_DATE = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const injectDate = (html) => html.replace(/\{\{DATE\}\}/g, BUILD_DATE);
 
 /* ---- пользователи по умолчанию (bootstrap, если нет cfg) ---- */
 const BOOTSTRAP_USERS = [
@@ -186,7 +192,7 @@ async function buildManifest(users) {
     if (!fs.existsSync(file)) { console.warn('нет исходника:', cfg.src); continue; }
     const html = fs.readFileSync(file, 'utf8');
     const cek = rand(32); ceks[id] = cek;
-    scn[id] = await gEnc(await rawKey(cek), enc.encode(JSON.stringify({ kicker: cfg.kicker, html: parseBody(html) })));
+    scn[id] = await gEnc(await rawKey(cek), enc.encode(JSON.stringify({ kicker: cfg.kicker, html: parseBody(injectDate(html)) })));
     meta[id] = { title: parseTitle(html) || id, kicker: cfg.kicker, kind: cfg.kind };
   }
   // 2) cfg-блок (источник правды по пользователям) + CONFIG_KEY
@@ -291,6 +297,7 @@ async function buildSite() {
 <div id="app">
 ${bodyInner}
 </div>
+<script>if(/[?&]pdf=/.test(location.search)){addEventListener('load',function(){setTimeout(function(){window.print()},500)})}</script>
 <script src="${assets}/anim.js" defer></script>
 </body>
 </html>
@@ -299,16 +306,17 @@ ${bodyInner}
   for (const [id, cfg] of Object.entries(SCENARIOS)) {
     const file = path.join(ROOT, cfg.src); if (!fs.existsSync(file)) continue;
     const raw = fs.readFileSync(file, 'utf8');
-    let body = parseBody(raw);
+    let body = parseBody(injectDate(raw));
     const sub = id !== 'hub'; const assets = sub ? '../assets' : 'assets';
     if (id === 'hub') {
-      // карточки-кнопки -> ссылки на статьи
-      body = body.replace(/<button class="rcard" data-scn="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g,
-        (m, scn, inner) => `<a class="rcard" href="${SLUG[scn] ? SLUG[scn] + '/' : '#'}">${inner}</a>`);
+      // кнопки карточек -> ссылки на статьи (Открыть -> /slug/, PDF -> /slug/?pdf=1)
+      body = body.replace(/<button class="rc-open" data-scn="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g,
+        (m, scn, inner) => `<a class="rc-open" href="${SLUG[scn] ? SLUG[scn] + '/' : '#'}">${inner}</a>`);
+      body = body.replace(/<button class="rc-pdf" data-pdf-scn="([^"]+)"[^>]*>([\s\S]*?)<\/button>/g,
+        (m, scn, inner) => `<a class="rc-pdf" href="${SLUG[scn] ? SLUG[scn] + '/?pdf=1' : '#'}">${inner}</a>`);
     } else {
-      const controls = `<span class="nav-actions"><a class="gate-logout" href="../">← Все исследования</a>` +
-        `<button class="gate-logout" type="button" onclick="window.print()">↓ PDF</button></span>`;
-      // встраиваем управление в шапку (вместо тега), иначе — фиксированной плашкой
+      // PDF теперь на карточке витрины; в статье — только возврат
+      const controls = `<span class="nav-actions"><a class="gate-logout" href="../">← Все исследования</a></span>`;
       if (/<span class="tag">[\s\S]*?<\/span>/.test(body)) body = body.replace(/<span class="tag">[\s\S]*?<\/span>/, controls);
       else body = `<div class="gate-controls">${controls}</div>\n` + body;
     }
