@@ -24,6 +24,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const subtle = globalThis.crypto.subtle;
 const ITER = 200000;
+
+/* ВРЕМЕННО: открытый вход одной кнопкой «Войти» (без логина/пароля).
+   true  — кнопка открывает витрину со всем (доступ публичный, ключ встроен);
+   false — обычный вход логин+пароль. Вернуть пароли = поставить false. */
+const OPEN_ACCESS = true;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -116,7 +121,18 @@ function attachBootstrapPasswords(users, secrets) {
 }
 
 /* ---- шаблон страницы-входа ---- */
-function shell(manifestJson) {
+function shell(manifestJson, openObj) {
+  var fields = openObj
+    ? `<div class="gate-fields"><button id="gate-btn" type="submit">Войти</button></div>`
+    : `<div class="gate-fields">
+      <input id="gate-login" type="text" placeholder="Логин" aria-label="Логин" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <input id="gate-pass" type="password" placeholder="Пароль" aria-label="Пароль">
+      <button id="gate-btn" type="submit">Войти</button>
+    </div>`;
+  var openScript = openObj ? `\n<script>window.__OPEN__=${JSON.stringify({ login: openObj.login, pw: openObj.pw })};</script>` : '';
+  return shellHtml(manifestJson, fields, openScript);
+}
+function shellHtml(manifestJson, fields, openScript) {
   return `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -138,16 +154,12 @@ function shell(manifestJson) {
     <div class="gate-logo" aria-label="Mednov">
       <svg viewBox="0 0 150.34 98.048" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.246 0H0V98.048H19.246V40.0158C24.5963 42.624 30.496 43.2228 35.4998 43.2228H43.6043V98.048H62.8503V43.2228H66.1564C72.2529 43.2228 77.8025 45.7263 81.8317 49.7593C85.861 53.7922 88.3623 59.3471 88.3623 65.4489V98.048H108.101V65.4489C108.101 53.8935 103.385 43.3952 95.7877 35.7906C88.19 28.1861 77.7015 23.4657 66.1564 23.4657H35.469C31.3423 23.4657 19.246 19.9774 19.246 6.85762V0Z" fill="#2CB0A8"/><path d="M136.251 97.8169C144.032 97.8169 150.34 91.5033 150.34 83.715C150.34 75.9268 144.032 69.6131 136.251 69.6131C128.47 69.6131 122.162 75.9268 122.162 83.715C122.162 91.5033 128.47 97.8169 136.251 97.8169Z" fill="#2CB0A8"/></svg>
     </div>
-    <div class="gate-fields">
-      <input id="gate-login" type="text" placeholder="Логин" aria-label="Логин" autocapitalize="off" autocorrect="off" spellcheck="false">
-      <input id="gate-pass" type="password" placeholder="Пароль" aria-label="Пароль">
-      <button id="gate-btn" type="submit">Войти</button>
-    </div>
+    ${fields}
     <div id="gate-err" class="gate-err" role="alert" hidden>Неверный логин или пароль</div>
   </form>
 </div>
 
-<script>window.__VAULT__=${manifestJson};</script>
+<script>window.__VAULT__=${manifestJson};</script>${openScript}
 <script src="assets/bg.js" defer></script>
 <script src="assets/anim.js" defer></script>
 <script src="assets/vault.js" defer></script>
@@ -187,7 +199,20 @@ async function buildManifest(users) {
       rcp.push({ salt: b64(salt), w });
     }
   }
-  return { iter: ITER, scn, cfg: cfgBlob, rcp };
+  // ВРЕМЕННО: гостевой доступ одной кнопкой — видит витрину и все исследования
+  let openObj = null;
+  if (OPEN_ACCESS) {
+    const pw = genPassword();
+    const ids = Object.keys(SCENARIOS).filter(id => ceks[id]);
+    const landing = ids.indexOf('hub') >= 0 ? 'hub' : ids[0];
+    const salt = rand(16);
+    const kek = await pbkdf2(passphrase('guest', pw), salt);
+    const w = {};
+    for (const id of ids) w[id] = await gEnc(kek, enc.encode(JSON.stringify({ k: b64(ceks[id]), l: id === landing, exp: null })));
+    rcp.push({ salt: b64(salt), w });
+    openObj = { login: 'guest', pw };
+  }
+  return { manifest: { iter: ITER, scn, cfg: cfgBlob, rcp }, openObj };
 }
 
 async function buildEncrypt() {
@@ -196,10 +221,10 @@ async function buildEncrypt() {
   if (users) console.log('Пользователи взяты из текущего index.html (cfg).');
   else { users = attachBootstrapPasswords(BOOTSTRAP_USERS, secrets); console.log('Пользователи: bootstrap из _src/secrets.json.'); }
 
-  const manifest = await buildManifest(users);
-  fs.writeFileSync(path.join(ROOT, 'index.html'), shell(JSON.stringify(manifest)));
-  console.log('✓ собрано: index.html\n');
-  console.log('Логины и пароли:');
+  const { manifest, openObj } = await buildManifest(users);
+  fs.writeFileSync(path.join(ROOT, 'index.html'), shell(JSON.stringify(manifest), openObj));
+  console.log('✓ собрано: index.html' + (OPEN_ACCESS ? '  [ОТКРЫТЫЙ ВХОД одной кнопкой]' : '') + '\n');
+  console.log('Логины и пароли (для админки и при возврате паролей):');
   for (const u of users) console.log(`  ${u.login.padEnd(8)} [${u.role}] ${(u.passwords || []).join(', ')}  → ${u.scenarios.join(', ')}${u.expires ? '  до ' + u.expires : ''}`);
 }
 

@@ -128,6 +128,20 @@
     var err = document.getElementById('gate-err');
     var btn = document.getElementById('gate-btn');
     if (!form) return;
+
+    // ВРЕМЕННО: открытый вход одной кнопкой (без полей)
+    if (window.__OPEN__ && !login) {
+      form.addEventListener('submit', async function (ev) {
+        ev.preventDefault();
+        btn.disabled = true; btn.textContent = 'Открываю…';
+        var res = null;
+        try { res = await tryLogin(window.__OPEN__.login, window.__OPEN__.pw); } catch (e) { res = null; }
+        if (res && res.landing) { await reveal(res.landing); }
+        else { btn.disabled = false; btn.textContent = 'Войти'; if (err) { err.textContent = 'Не удалось открыть'; err.hidden = false; } }
+      });
+      return;
+    }
+
     form.addEventListener('submit', async function (ev) {
       ev.preventDefault();
       if (!login.value || !pass.value) return;
