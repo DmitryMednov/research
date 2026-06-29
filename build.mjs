@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const subtle = globalThis.crypto.subtle;
@@ -132,7 +133,13 @@ function shell(manifestJson, openObj) {
   var openScript = openObj ? `\n<script>window.__OPEN__=${JSON.stringify({ login: openObj.login, pw: openObj.pw })};</script>` : '';
   return shellHtml(manifestJson, fields, openScript);
 }
+/* версия ассета для cache-busting (?v=hash) — браузер всегда берёт свежий файл */
+function assetV(file) {
+  try { return createHash('sha1').update(fs.readFileSync(path.join(ROOT, 'assets', file))).digest('hex').slice(0, 8); }
+  catch { return '1'; }
+}
 function shellHtml(manifestJson, fields, openScript) {
+  const vCss = assetV('site.css'), vBg = assetV('bg.js'), vAnim = assetV('anim.js'), vVault = assetV('vault.js');
   return `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -144,7 +151,7 @@ function shellHtml(manifestJson, fields, openScript) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/site.css?v=${vCss}">
 </head>
 <body>
 <div id="app" hidden></div>
@@ -160,9 +167,9 @@ function shellHtml(manifestJson, fields, openScript) {
 </div>
 
 <script>window.__VAULT__=${manifestJson};</script>${openScript}
-<script src="assets/bg.js" defer></script>
-<script src="assets/anim.js" defer></script>
-<script src="assets/vault.js" defer></script>
+<script src="assets/bg.js?v=${vBg}" defer></script>
+<script src="assets/anim.js?v=${vAnim}" defer></script>
+<script src="assets/vault.js?v=${vVault}" defer></script>
 </body>
 </html>
 `;
