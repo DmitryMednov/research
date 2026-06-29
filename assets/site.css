@@ -287,8 +287,8 @@ ul.links li .note{grid-column:1 / -1;font-size:.82rem;color:var(--text-muted)}
 /* ============ FOOTER ============ */
 footer{border-top:1px solid var(--border-hairline);color:var(--text-muted);font-family:var(--mono);font-size:.72rem;
   letter-spacing:.06em;padding:28px 0;text-align:center}
-footer .wrap{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-footer .wrap::before{content:"";width:22px;height:15px;background:url(logo-mark-white.svg) center/contain no-repeat;opacity:.5;display:inline-block;flex:none}
+footer .wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+footer .wrap::before{content:"";width:30px;height:20px;background:url(logo-mark.svg) center/contain no-repeat;opacity:.85;display:block}
 footer a{color:var(--turquoise);border:0}
 
 /* ============ ANIMATIONS ============ */
