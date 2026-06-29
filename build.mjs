@@ -28,8 +28,9 @@ const ITER = 200000;
 
 /* ВРЕМЕННО: открытый вход одной кнопкой «Войти» (без логина/пароля).
    true  — кнопка открывает витрину со всем (доступ публичный, ключ встроен);
-   false — обычный вход логин+пароль. Вернуть пароли = поставить false. */
-const OPEN_ACCESS = true;
+   false — обычный вход логин+пароль. Вернуть пароли = поставить false.
+   Можно переопределить переменной окружения OPEN_ACCESS=0|1 (для автотестов). */
+const OPEN_ACCESS = process.env.OPEN_ACCESS !== undefined ? process.env.OPEN_ACCESS === '1' : true;
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 

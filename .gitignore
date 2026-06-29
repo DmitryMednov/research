@@ -7,8 +7,11 @@ _site/
 
 # build deps
 node_modules/
-package.json
 package-lock.json
 
 # локальные проверки
 scratch-*
+*-shot.png
+shot-*.png
+m-*.png
+d-*.png

@@ -363,7 +363,9 @@ select.adm-in option{background:var(--deep-green);color:var(--white)}
 /* ============ PRINT / PDF ============ */
 @media print{
   @page{margin:14mm}
-  html,body{background:#fff!important;color:#15211c!important}
+  html,body{background:#fff!important;color:#15211c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* базовый тёмный цвет для ВСЕГО текста (без !important — акценты-заголовки ниже его перекрывают) */
+  #app,#app *{color:#1b2a24}
   body::before,body::after,#bgfx,.brandbar,.gate-controls,#gate,.roadhint,.roadline{display:none!important}
   #app{display:block!important}
   #app section::before,#app .dir::before{display:none!important}
@@ -379,12 +381,13 @@ select.adm-in option{background:var(--deep-green);color:var(--white)}
   .callout{background:#eef7f5!important;border:1px solid #bfe0d9!important;box-shadow:none!important}
   .callout h3,.callout p,.callout .eyebrow{color:#0c3b38!important}
   .chip,.tag,.rc-tags span,.src{background:#eef7f5!important;color:#0a7d73!important;border:1px solid #bfe0d9!important}
-  .t-key{background:#0a7d73!important;color:#fff!important}
+  .t-key{background:#eef7f5!important;color:#0a7d73!important;border:1px solid #bfe0d9!important}
   a{color:#0a7d73!important}
   /* раскрываем все «гармошки» (роадмап, каналы, ссылки) */
   .rdetail{max-height:none!important;margin-top:6px!important;overflow:visible!important}
   .ritem .chev{display:none!important}
-  .phase-h{color:#fff!important}
+  /* фазы роадмапа: тёмный текст по светлому фону (тёмный фон в печать не идёт) */
+  .phase-h{background:#eef7f5!important;color:#0c3b38!important;box-shadow:none!important}
   .phases{grid-template-columns:repeat(2,1fr)!important}
   /* убираем анимационные скрытые состояния */
   .split .i{transform:none!important;opacity:1!important;filter:none!important}

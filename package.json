@@ -1,0 +1,16 @@
+{
+  "name": "mednov-research",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Mednov Family Office — зашифрованный архив исследований",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:site": "node build.mjs site",
+    "decrypt": "node build.mjs decrypt",
+    "test": "node tests/run.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.48.0"
+  }
+}
