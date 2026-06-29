@@ -235,7 +235,7 @@ ul.links li .note{grid-column:1 / -1;font-size:.82rem;color:var(--text-muted)}
 .rgrid{display:grid;gap:16px}
 @media(min-width:680px){.rgrid{grid-template-columns:1fr 1fr}}
 .rcard{position:relative;overflow:hidden;display:flex;flex-direction:column;text-align:left;width:100%;
-  padding:24px 24px 6px;color:var(--white);min-height:184px;
+  padding:24px 24px 0;color:var(--white);min-height:184px;
   transition:transform .4s var(--ease-spring),background .4s var(--ease),border-color .4s,box-shadow .4s}
 .rcard::before{content:"";position:absolute;inset:0;pointer-events:none;background:var(--glass-highlight)}
 .rcard:hover{transform:translateY(-8px);background:rgba(44,176,168,.11);border-color:var(--border-strong);box-shadow:var(--shadow-card-hover),var(--glass-rim)}
@@ -246,13 +246,13 @@ ul.links li .note{grid-column:1 / -1;font-size:.82rem;color:var(--text-muted)}
 .rcard .rc-tags span{font-family:var(--mono);font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;
   background:var(--turquoise-08);border:1px solid var(--border-accent);color:var(--turquoise);padding:4px 9px;border-radius:var(--radius-pill)}
 /* нижняя плашка карточки: «Открыть» | «PDF» */
-.rcard .rc-actions{position:relative;z-index:1;margin-top:auto;display:flex;align-items:stretch;
-  border-top:1px solid var(--border-hairline);margin-left:-24px;margin-right:-24px;padding:0 8px}
+.rcard .rc-actions{position:relative;z-index:1;margin:auto -24px 0;display:flex;align-items:stretch;
+  border-top:1px solid var(--border-hairline)}
 .rcard .rc-open,.rcard .rc-pdf{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
-  background:transparent;border:0;cursor:pointer;color:var(--turquoise);padding:15px 16px;display:inline-flex;align-items:center;gap:7px;
+  background:transparent;border:0;cursor:pointer;color:var(--turquoise);padding:15px 18px;display:inline-flex;align-items:center;gap:7px;
   transition:color .2s,background .2s}
-.rcard .rc-open{flex:1}
-.rcard .rc-pdf{flex:none;color:var(--text-secondary);border-left:1px solid var(--border-hairline)}
+.rcard .rc-open{flex:1;padding-left:24px}
+.rcard .rc-pdf{flex:none;padding-right:24px;color:var(--text-secondary);border-left:1px solid var(--border-hairline)}
 .rcard .rc-open:hover{color:var(--white)}
 .rcard .rc-pdf:hover{color:var(--white);background:var(--turquoise-08)}
 .rcard .rc-open .arr{transition:transform .3s var(--ease)}

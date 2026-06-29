@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — JobTread Migration Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  /* Light theme — KH Build main site palette (default) */
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --surface2: #F5F3EE;
+  --border: #E0DDD3;
+  --text: #1A1A1A;
+  --muted: #6B6A65;
+  --accent: #C9A65D;
+  --accent-strong: #B38F47;
+  --dark-section: #1A1A1A;
+  --on-dark: #F5F3EE;
+  --danger: #C0392B;
+  --success: #1D9E75;
+  --warning: #D4850F;
+  --warning-text: #8B6914;
+  --warning-bg: #FEF3E0;
+  --success-text: #0F6E56;
+  --success-bg: #E8F8F0;
+  --danger-text: #8B2818;
+  --danger-bg: #FCEEEC;
+  --on-accent: #1A1A1A;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg: #141414;
+  --card: #1F1F1F;
+  --surface2: #292826;
+  --border: #38342A;
+  --text: #F5F3EE;
+  --muted: #9A938A;
+  --accent: #C9A65D;
+  --accent-strong: #D9B870;
+  --dark-section: #0B0B0B;
+  --on-dark: #F5F3EE;
+  --danger: #ef4444;
+  --success: #22c997;
+  --warning: #f59e0b;
+  --warning-text: #fcd34d;
+  --warning-bg: rgba(245, 158, 11, 0.14);
+  --success-text: #6ee7b7;
+  --success-bg: rgba(34, 201, 151, 0.14);
+  --danger-text: #fca5a5;
+  --danger-bg: rgba(239, 68, 68, 0.14);
+  --on-accent: #141414;
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:var(--bg); color:var(--text); line-height:1.6; font-weight:400; }
+.container { max-width:1200px; margin:0 auto; padding:24px; }
+
+/* Theme toggle */
+.theme-toggle {
+  position:fixed; top:18px; right:18px; z-index:1000;
+  width:42px; height:42px; border-radius:50%;
+  border:2px solid var(--accent); background:var(--dark-section); color:var(--accent);
+  font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25); transition:transform .2s, background .2s;
+  font-family:inherit;
+}
+.theme-toggle:hover { transform:scale(1.1); background:var(--accent); color:var(--dark-section); }
+[data-theme="dark"] .theme-toggle__light { display:none; }
+[data-theme="light"] .theme-toggle__dark, :root:not([data-theme="dark"]) .theme-toggle__dark { display:none; }
+
+/* Header — KH Build dark band with gold logo */
+.header {
+  text-align:center; padding:56px 24px 40px; margin:-24px -24px 40px;
+  background:var(--dark-section); color:var(--on-dark);
+  border-bottom:3px solid var(--accent);
+}
+.header h1 { font-size:30px; font-weight:700; margin-bottom:10px; color:var(--on-dark); text-transform:uppercase; letter-spacing:1px; }
+.header .subtitle { color:#B8B5AA; font-size:14px; letter-spacing:0.5px; }
+.header .logo { font-size:24px; letter-spacing:6px; color:var(--accent); margin-bottom:18px; font-weight:800; }
+.header .back {
+  display:inline-block; padding:10px 22px; background:var(--accent); color:var(--dark-section);
+  border-radius:4px; text-decoration:none; font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.5px; margin-top:24px; transition:opacity .2s;
+}
+.header .back:hover { opacity:0.85; }
+
+/* KPIs */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-bottom:32px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:18px 20px; text-align:center; box-shadow:var(--shadow); }
+.kpi .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; font-weight:600; }
+.kpi .value { font-size:28px; font-weight:700; }
+.kpi .note { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi.accent .value { color:var(--accent); }
+
+/* Section headers */
+.section-title { font-size:22px; font-weight:700; margin:48px 0 16px; padding-bottom:10px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:1px; }
+.section-desc { color:var(--muted); font-size:14px; margin-bottom:20px; }
+
+/* Prose */
+.prose { font-size:14px; line-height:1.7; color:var(--text); margin-bottom:24px; }
+.prose p { margin-bottom:12px; }
+.prose a { color:var(--accent); text-decoration:none; }
+.prose a:hover { text-decoration:underline; }
+
+/* Scale grid (cards) */
+.scale-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:16px; margin-bottom:32px; }
+.scale-card { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:22px; box-shadow:var(--shadow); }
+.scale-card h3 { font-size:15px; font-weight:700; margin-bottom:8px; }
+.scale-card .person { font-size:13px; color:var(--muted); margin-bottom:12px; }
+.scale-card .body { font-size:13px; line-height:1.7; }
+.scale-card .meta { font-size:12px; color:var(--muted); margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); line-height:1.6; }
+
+/* RACI table */
+.raci-wrap { background:var(--card); border:1px solid var(--border); border-radius:4px; overflow-x:auto; -webkit-overflow-scrolling:touch; box-shadow:var(--shadow); margin-bottom:28px; }
+.raci-table { width:100%; border-collapse:collapse; font-size:13px; }
+.raci-table th { background:var(--surface2); color:var(--text); font-weight:700; text-align:left; padding:12px 14px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:0.5px; font-size:11px; }
+.raci-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+.raci-table tr:last-child td { border-bottom:none; }
+.raci-table tr:hover td { background:var(--surface2); }
+.raci-table td.owner { font-weight:600; color:var(--accent); }
+
+/* Footer */
+.footer {
+  text-align:center; padding:32px 24px; margin:48px -24px -24px;
+  color:var(--on-dark); font-size:12px; letter-spacing:0.5px;
+  background:var(--dark-section); border-top:3px solid var(--accent);
+}
+
+/* Mobile optimization */
+@media (max-width:768px) {
+  .container { padding:14px; }
+  .header { padding:32px 16px 24px; margin:-14px -14px 24px; }
+  .header h1 { font-size:20px; letter-spacing:0.5px; }
+  .header .subtitle { font-size:11px; line-height:1.5; }
+  .header .logo { font-size:18px; letter-spacing:4px; margin-bottom:12px; }
+  .header .back { padding:8px 14px; font-size:10px; margin-top:16px; }
+  .section-title { font-size:16px; margin:28px 0 10px; }
+  .section-desc { font-size:12px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .kpi { padding:12px 14px; }
+  .kpi .value { font-size:20px; }
+  .kpi .label { font-size:10px; }
+  .kpi .note { font-size:10px; }
+  .prose { font-size:13px; }
+  .scale-grid { grid-template-columns:1fr; gap:12px; }
+  .scale-card { padding:16px; }
+  .scale-card h3 { font-size:14px; }
+  .scale-card .body, .scale-card .meta { font-size:12px; }
+  .raci-table { font-size:11px; min-width:600px; }
+  .raci-table th, .raci-table td { padding:8px 6px; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+  .footer { padding:20px 16px; margin:32px -14px -14px; font-size:10px; line-height:1.6; }
+}
+@media (max-width:420px) {
+  .kpi-grid { grid-template-columns:1fr; }
+  .header h1 { font-size:18px; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+
+<div class="container">
+
+<div class="header">
+  <div class="logo">KH BUILD</div>
+  <h1>JobTread Migration Plan</h1>
+  <div class="subtitle">KH Build LLC | Переход с BuilderTrend на JobTread | План, роли, блоки | Обновлено 20 апреля 2026 | Конфиденциально</div>
+  <a class="back" href="index.html">← Назад к карте процессов</a>
+</div>
+
+<!-- Executive KPIs -->
+<div class="kpi-grid">
+  <div class="kpi accent">
+    <div class="label">Горизонт миграции</div>
+    <div class="value">1,5–2 мес</div>
+    <div class="note">14 апр → июнь 2026</div>
+  </div>
+  <div class="kpi accent">
+    <div class="label">Проектов к переносу</div>
+    <div class="value">7 + 2</div>
+    <div class="note">7 активных + 2 новых</div>
+  </div>
+  <div class="kpi accent">
+    <div class="label">Блоков миграции</div>
+    <div class="value">10</div>
+    <div class="note">от tenant setup до обучения</div>
+  </div>
+  <div class="kpi accent">
+    <div class="label">Data points в модели</div>
+    <div class="value">217</div>
+    <div class="note">цель — 80%+ покрытия в JT</div>
+  </div>
+</div>
+
+<!-- SECTION 1 — Status & Decision -->
+<div class="section-title">1. Статус и решение</div>
+<div class="section-desc">Зафиксировано 14 апреля 2026 на созвоне: Дмитрий Сережин, Артур Атанов, Дмитрий Меднов, Анастасия Куранова.</div>
+<div class="prose">
+  <p>Принято решение о полной миграции с BuilderTrend на JobTread. Причина: BuilderTrend не имеет публичного API, что блокировало AI-интеграцию 4 из 12 этапов процесса. JobTread предоставляет GraphQL API (Pave), нативную интеграцию с QuickBooks и современный UI, который команда легче примет в ежедневной работе. Горизонт миграции — 1,5–2 месяца. После завершения — обучение команды по внутренним материалам JobTread.</p>
+</div>
+
+<!-- SECTION 2 — Migration Phases -->
+<div class="section-title">2. Фазы миграции</div>
+
+<div class="scale-grid">
+  <div class="scale-card">
+    <h3>Шаг 0 · В работе</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Ожидаем в ближайшее время</div>
+    <div class="body">Покупка подписки JobTread и выдача доступов.</div>
+    <div class="meta"><strong>Ответственный:</strong> Артур<br><strong>Условие старта Шага 1.</strong></div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Шаг 1 · Дедлайн 20 апреля</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Роли и задания</div>
+    <div class="body">Роли ответственных и установочные задания по блокам миграции.</div>
+    <div class="meta"><strong>Ответственный:</strong> Артур утверждает<br><strong>Продукт:</strong> утверждённый RACI и задания по 10 блокам.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Шаг 2 · Дедлайн 27 апреля</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Процессы как шаблоны</div>
+    <div class="body">Финальные производственные процессы как шаблоны в JobTread.</div>
+    <div class="meta"><strong>Ответственный:</strong> вся команда — согласование через еженедельные созвоны<br><strong>Продукт:</strong> Job Templates, Schedule Templates, Cost Catalog.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Шаг 3 · С 27 апреля</h3>
+    <div class="person" style="color:var(--success); font-weight:500;">Перенос проектов</div>
+    <div class="body">Перенос текущих проектов с BT в JT.</div>
+    <div class="meta"><strong>Ответственный:</strong> Андрей ведущий — поддержка PMs, Анастасии, Алёны<br><strong>Продукт:</strong> 7 активных + 2 новых проекта в JT.</div>
+  </div>
+</div>
+
+<!-- SECTION 3 — RACI -->
+<div class="section-title">3. Матрица ответственности (RACI)</div>
+<div class="section-desc">Распределение ответственности по блокам миграции. Owner — исполнитель. Support — помощь. Approver — утверждает результат.</div>
+
+<div class="raci-wrap"><table class="raci-table">
+  <thead>
+    <tr>
+      <th>Блок миграции</th>
+      <th>Owner</th>
+      <th>Support</th>
+      <th>Approver</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Tenant setup, подписка, пользователи</td><td class="owner">Артур</td><td>Андрей</td><td>Артур</td></tr>
+    <tr><td>Company/Vendor directory (субподрядчики с контактами)</td><td class="owner">Анастасия</td><td>Иван, Алёна</td><td>Артур</td></tr>
+    <tr><td>Cost Catalog / Estimator templates</td><td class="owner">Алёна</td><td>Анастасия</td><td>Артур</td></tr>
+    <tr><td>Schedule Templates (production phases)</td><td class="owner">Андрей</td><td>PMs (Richard, Gregory, Zachary)</td><td>Артур</td></tr>
+    <tr><td>Document/Folder structure (зеркало Google Drive)</td><td class="owner">Андрей</td><td>Shaylen</td><td>Артур</td></tr>
+    <tr><td>Client communication templates (GHL ↔ JT)</td><td class="owner">Shaylen</td><td>Денис (GHL-настройка)</td><td>Артур</td></tr>
+    <tr><td>Financial integration (QuickBooks, Sworn Statement)</td><td class="owner">Анастасия</td><td>Иван</td><td>Артур, Дмитрий С.</td></tr>
+    <tr><td>Перенос 7 активных проектов</td><td class="owner">Андрей</td><td>PMs, Анастасия</td><td>Артур</td></tr>
+    <tr><td>2 новых проекта (сразу в JT)</td><td class="owner">Андрей</td><td>Алёна</td><td>Артур</td></tr>
+    <tr><td>Обучение и adoption-контроль</td><td class="owner" style="color:var(--warning);">TBD</td><td>Shaylen</td><td>Артур</td></tr>
+  </tbody>
+</table></div>
+
+<!-- SECTION 4 — Scope freeze -->
+<div class="section-title">4. Scope freeze — что именно переносим</div>
+<div class="section-desc">Список объектов миграции, зафиксированный 14 апреля. Добавления после этой даты — отдельным скоупом после Шага 3.</div>
+
+<div class="scale-grid">
+  <div class="scale-card">
+    <h3>Общие данные компании</h3>
+    <div class="body">Реквизиты, лицензии, страховки, шаблоны документов.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Сотрудники с ролями</h3>
+    <div class="body">10 пользователей: Артур, Андрей, Анастасия, Иван, Shaylen, Алёна, 3 PM (Richard, Gregory, Zachary), Дмитрий М.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Шаблоны процессов</h3>
+    <div class="body">Job Templates по 9 фазам, Schedule Templates, Cost Catalog из Estimator, Custom Fields под 217 data points.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Субподрядчики с контактами</h3>
+    <div class="body">Полный vendor directory: Trade, Contact, Email, Phone, Payment Terms, 1099 status, COI expiry.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>7 активных проектов</h3>
+    <div class="body">Google Drive per-project, Construction Schedule, Estimator, Sworn Statement, Client communication log. Полный список проектов портфеля — в <a href="portfolio_dashboard.html" style="color:var(--accent); font-weight:700;">Дэшборде портфеля →</a>.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>2 новых проекта</h3>
+    <div class="body">Заводятся сразу в JT — без заведения в BT.</div>
+  </div>
+</div>
+
+<!-- SECTION 5 — Risks -->
+<div class="section-title">5. Риски и митигация</div>
+
+<div class="scale-grid">
+  <div class="scale-card">
+    <h3>Параллельная работа в BT и JT</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Операционный риск</div>
+    <div class="body">1,5–2 месяца команда работает в двух системах. <strong>Митигация:</strong> freeze date для новых данных в BT после завершения Шага 2; проекты на финальных стадиях (drywall, finishes) дорабатываем в BT, не переносим.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Нагрузка на Алёну (Cost Catalog)</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Ресурсный риск</div>
+    <div class="body">Алёна приняла estimations+procurement с 31 марта. Cost Catalog — самый объёмный блок (Estimator Rab Residence = 80+ позиций). <strong>Митигация:</strong> привлечь Анастасию как Support, либо сдвинуть часть блока на Шаг 3.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>JobTread subscription tier</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Контрактный риск</div>
+    <div class="body">Нужно подтвердить до покупки: API access, QuickBooks integration, Custom Fields, минимум 10 пользователей. <strong>Митигация:</strong> Артур уточняет тариф у JT sales до покупки подписки.</div>
+  </div>
+
+  <div class="scale-card">
+    <h3>Adoption-контроль не назначен</h3>
+    <div class="person" style="color:var(--warning); font-weight:500;">Организационный риск</div>
+    <div class="body">Owner блока «Обучение и adoption-контроль» — TBD. Без выделенного человека, который будет контролировать использование JT всей командой после миграции, есть риск повторения ситуации с BuilderTrend (непоследовательное использование, партизанская работа в Google Drive). <strong>Митигация:</strong> Артур назначает ответственного до завершения Шага 2 (внутренний кандидат или внешний консультант JobTread Professional Services).</div>
+  </div>
+</div>
+
+<!-- SECTION 6 — Working rhythm -->
+<div class="section-title">6. Ритм работы</div>
+<div class="prose">
+  <p>После 27 апреля — еженедельные созвоны (минимум один, оптимально два) по прогрессу миграции. Участники: Артур, Андрей, Анастасия. По отдельным блокам привлекаются Алёна, Shaylen, Иван, PMs.</p>
+  <p>После завершения миграции — командное обучение по внутренним материалам JobTread (<a href="https://jobtread.com/resources/training" target="_blank">jobtread.com/resources/training</a>) и общий обзор (<a href="https://youtu.be/V_F56DmrC6Q" target="_blank">youtu.be/V_F56DmrC6Q</a>).</p>
+  <p>Текущий производственный процесс как основа для настройки шаблонов — см. <a href="kh_build_process_flowchart.html">Граф производственного процесса</a>.</p>
+</div>
+
+<div class="footer">
+  KH Build LLC · JobTread Migration Plan · Обновлено 20 апреля 2026 · Конфиденциально
+</div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

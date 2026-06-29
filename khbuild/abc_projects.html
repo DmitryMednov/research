@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — ABC Projects</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  --bg:#FFFFFF; --card:#FFFFFF; --surface2:#F5F3EE; --border:#E0DDD3;
+  --text:#1A1A1A; --muted:#6B6A65; --accent:#C9A65D; --accent-strong:#B38F47;
+  --dark-section:#1A1A1A; --on-dark:#F5F3EE;
+  --danger:#C0392B; --success:#1D9E75; --warning:#D4850F; --ai:#6C41D4;
+  --danger-bg:#FCEEEC; --success-bg:#E8F8F0; --warning-bg:#FEF3E0; --ai-bg:#F0ECFE;
+  --danger-text:#8B2818; --warning-text:#8B6914; --success-text:#0F6E56; --ai-text:#4A2B96;
+  --on-accent:#1A1A1A; --shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg:#141414; --card:#1F1F1F; --surface2:#292826; --border:#38342A;
+  --text:#F5F3EE; --muted:#9A938A; --accent:#C9A65D; --accent-strong:#D9B870;
+  --dark-section:#0B0B0B;
+  --danger:#ef4444; --success:#22c997; --warning:#f59e0b; --ai:#a78bfa;
+  --danger-bg:rgba(239,68,68,0.14); --success-bg:rgba(34,201,151,0.14);
+  --warning-bg:rgba(245,158,11,0.14); --ai-bg:rgba(167,139,250,0.14);
+  --danger-text:#fca5a5; --warning-text:#fcd34d; --success-text:#6ee7b7; --ai-text:#c4b5fd;
+  --on-accent:#141414; --shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Montserrat',-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+.container { max-width:1280px; margin:0 auto; padding:24px; }
+.theme-toggle { position:fixed; top:18px; right:18px; z-index:1000; width:42px; height:42px; border-radius:50%;
+  border:2px solid var(--accent); background:var(--dark-section); color:var(--accent); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 2px 12px rgba(0,0,0,0.25); }
+.theme-toggle:hover { transform:scale(1.1); background:var(--accent); color:var(--dark-section); }
+[data-theme="dark"] .theme-toggle__light { display:none; }
+[data-theme="light"] .theme-toggle__dark,:root:not([data-theme="dark"]) .theme-toggle__dark { display:none; }
+.header { text-align:center; padding:56px 24px 40px; margin:-24px -24px 40px;
+  background:var(--dark-section); color:var(--on-dark); border-bottom:3px solid var(--accent); }
+.header h1 { font-size:30px; font-weight:700; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
+.header .subtitle { color:#B8B5AA; font-size:14px; margin-bottom:14px; }
+.header .logo { font-size:24px; letter-spacing:6px; color:var(--accent); margin-bottom:18px; font-weight:800; }
+.header .back { display:inline-block; color:var(--accent); text-decoration:none; font-size:12px; border:1px solid var(--accent); padding:6px 14px; border-radius:4px; }
+.header .back:hover { background:var(--accent); color:var(--dark-section); }
+.section-title { font-size:20px; font-weight:700; margin:36px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:1px; }
+.section-desc { color:var(--muted); font-size:13px; margin-bottom:18px; }
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:16px 20px; text-align:center; box-shadow:var(--shadow); }
+.kpi .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; font-weight:600; }
+.kpi .value { font-size:26px; font-weight:700; }
+.kpi .note { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi.success .value { color:var(--success); }
+.kpi.warning .value { color:var(--warning); }
+.kpi.danger .value { color:var(--danger); }
+.kpi.accent .value { color:var(--accent); }
+.crisis-banner { background:var(--danger-bg); border:1px solid var(--danger); border-left:5px solid var(--danger); border-radius:4px; padding:18px 22px; margin-bottom:24px; box-shadow:var(--shadow); }
+.crisis-banner .cb-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--danger-text); margin-bottom:10px; }
+.crisis-banner ul { margin-left:20px; font-size:13px; line-height:1.7; }
+.crisis-banner strong { color:var(--danger-text); }
+.table-wrap { overflow-x:auto; background:var(--card); border:1px solid var(--border); border-radius:4px; box-shadow:var(--shadow); margin-bottom:24px; }
+table.data { width:100%; border-collapse:collapse; font-size:12px; }
+table.data thead th { background:var(--surface2); padding:10px 8px; text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; color:var(--muted); border-bottom:2px solid var(--border); white-space:nowrap; }
+table.data thead th.num, table.data td.num { text-align:right; font-variant-numeric:tabular-nums; }
+table.data tbody td { padding:9px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+table.data tbody tr:last-child td { border-bottom:none; }
+table.data tbody tr:hover { background:var(--surface2); }
+table.data .tot td { background:var(--surface2); font-weight:700; border-top:2px solid var(--accent); }
+table.data .status { display:inline-block; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; }
+table.data .status.active { background:var(--success-bg); color:var(--success-text); }
+table.data .status.sold { background:var(--surface2); color:var(--muted); }
+table.data .status.over { background:var(--danger-bg); color:var(--danger-text); }
+table.data .status.tight { background:var(--warning-bg); color:var(--warning-text); }
+table.data .cell-danger { color:var(--danger); font-weight:700; }
+table.data .cell-warning { color:var(--warning-text); font-weight:600; }
+table.data .cell-success { color:var(--success-text); }
+.pain-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; margin-bottom:24px; }
+.pain-card { border-radius:4px; padding:16px 18px; box-shadow:var(--shadow); border:1px solid var(--border); }
+.pain-card.red { background:var(--danger-bg); border-color:var(--danger); border-left:4px solid var(--danger); }
+.pain-card.yellow { background:var(--warning-bg); border-color:var(--warning); border-left:4px solid var(--warning); }
+.pain-card.green { background:var(--success-bg); border-color:var(--success); border-left:4px solid var(--success); }
+.pain-card .pc-cat { font-size:10px; text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:6px; }
+.pain-card.red .pc-cat { color:var(--danger-text); }
+.pain-card.yellow .pc-cat { color:var(--warning-text); }
+.pain-card.green .pc-cat { color:var(--success-text); }
+.pain-card h3 { font-size:14px; font-weight:700; margin-bottom:8px; }
+.pain-card p, .pain-card ul { font-size:12px; line-height:1.6; }
+.pain-card ul { margin-left:16px; }
+.footer { text-align:center; padding:32px 24px; margin:48px -24px -24px; color:var(--on-dark); font-size:12px; background:var(--dark-section); border-top:3px solid var(--accent); }
+@media (max-width:768px) {
+  .container { padding:14px; }
+  .header { padding:32px 16px 24px; margin:-14px -14px 24px; }
+  .header h1 { font-size:20px; }
+  .header .logo { font-size:18px; letter-spacing:4px; }
+  .section-title { font-size:16px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; }
+  .kpi .value { font-size:20px; }
+  .pain-grid { grid-template-columns:1fr; }
+  table.data { font-size:11px; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+}
+@media (max-width:420px) { .kpi-grid { grid-template-columns:1fr; } }
+.lock-overlay { position:fixed; inset:0; z-index:9999; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:20px; }
+.lock-box { max-width:420px; width:100%; background:var(--card); border:1px solid var(--border); border-top:4px solid var(--accent); border-radius:6px; padding:36px 32px; box-shadow:0 8px 32px rgba(0,0,0,0.12); text-align:center; }
+.lock-box .lock-logo { font-size:22px; letter-spacing:6px; color:var(--accent); font-weight:800; margin-bottom:14px; }
+.lock-box h2 { font-size:18px; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+.lock-box .hint { font-size:12px; color:var(--muted); margin-bottom:22px; line-height:1.6; }
+.lock-box input { width:100%; padding:12px 14px; font-size:15px; font-family:inherit; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:4px; margin-bottom:12px; text-align:center; letter-spacing:2px; }
+.lock-box input:focus { outline:none; border-color:var(--accent); }
+.lock-box button { width:100%; padding:12px; background:var(--accent); color:var(--dark-section); border:none; border-radius:4px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; font-family:inherit; cursor:pointer; transition:opacity .2s; }
+.lock-box button:hover { opacity:0.85; }
+.lock-box .err { color:var(--danger); font-size:12px; margin-top:10px; min-height:16px; font-weight:600; }
+.lock-box .back { display:inline-block; margin-top:18px; color:var(--muted); font-size:11px; text-decoration:none; letter-spacing:0.5px; }
+.lock-box .back:hover { color:var(--accent); }
+.gated-content { display:none; }
+.gated-content.unlocked { display:block; }
+</style>
+</head>
+<body>
+
+<!-- Access gate -->
+<div class="lock-overlay" id="lock-overlay">
+  <div class="lock-box">
+    <div class="lock-logo">KH BUILD</div>
+    <h2>🔒 Закрытый раздел</h2>
+    <div class="hint">ABC Projects — инвойсы подрядчиков и кредитные линии. Доступ по паролю — только для инвестора и руководства.</div>
+    <form id="lock-form" autocomplete="off">
+      <input type="password" id="lock-pw" placeholder="пароль" autofocus autocomplete="off">
+      <button type="submit">Открыть</button>
+      <div class="err" id="lock-err"></div>
+    </form>
+    <a class="back" href="index.html">← Вернуться на главную</a>
+  </div>
+</div>
+
+<div class="gated-content" id="gated-content">
+<button class="theme-toggle" onclick="toggleTheme()"><span class="theme-toggle__light">🌙</span><span class="theme-toggle__dark">☀</span></button>
+<div class="container">
+
+<div class="header">
+  <div class="logo">KH BUILD</div>
+  <h1>ABC Projects</h1>
+  <div class="subtitle">Счета подрядчиков · кредитные линии · разрыв финансирования</div>
+  <a class="back" href="index.html">← Назад на главную</a>
+</div>
+
+<div class="crisis-banner">
+  <div class="cb-title">🚨 Разрыв покрытия по ABC</div>
+  <ul>
+    <li>Выставленные счета (invoices) + кредитка = <strong>$291,332</strong>. Доступный лимит по банку = <strong>$175,374</strong>. <strong>Разрыв $115,958</strong> — кассой не покрыт.</li>
+    <li>По 3 объектам (<strong>4555, 4527, 4535</strong>) доступный лимит близок к нулю при растущих счетах — риск овердрафта / задержки платежей подрядчикам.</li>
+    <li>Три объекта уже <strong>проданы</strong> (4517 · 6282 · 6018) — по ним входящий cash на $327K+ должен закрыть часть долгов.</li>
+    <li>Дополнительный блок Tampa/Sarasota на <strong>$83,341</strong>, из которых <strong>$10,071 помечены «не оплачивать»</strong> — закрепить почему, это аудит-след.</li>
+  </ul>
+  <div style="margin-top:12px; font-size:12px; color:var(--danger-text);">
+    ABC — <strong>отдельный контур</strong> (инвойсы подрядчиков и банковские линии по конкретным адресам), не пересекается с основным GC-портфелем из 14 fee-проектов — см. <a href="portfolio_dashboard.html" style="color:var(--danger-text); font-weight:700;">Дэшборд портфеля →</a>.
+  </div>
+</div>
+
+<!-- KPI -->
+<div class="section-title">Ключевые цифры</div>
+<div class="kpi-grid">
+  <div class="kpi danger">
+    <div class="label">Invoices к оплате</div>
+    <div class="value">$267.8K</div>
+    <div class="note">10 объектов</div>
+  </div>
+  <div class="kpi warning">
+    <div class="label">Кредитка KH Build</div>
+    <div class="value">$23.5K</div>
+    <div class="note">текущий баланс</div>
+  </div>
+  <div class="kpi danger">
+    <div class="label">Общий долг</div>
+    <div class="value">$291.3K</div>
+    <div class="note">invoices + credit card</div>
+  </div>
+  <div class="kpi warning">
+    <div class="label">Доступный лимит</div>
+    <div class="value">$175.4K</div>
+    <div class="note">все линии</div>
+  </div>
+  <div class="kpi danger">
+    <div class="label">Разрыв покрытия</div>
+    <div class="value">−$115.9K</div>
+    <div class="note">долг больше лимита</div>
+  </div>
+  <div class="kpi success">
+    <div class="label">Sales в работе</div>
+    <div class="value">$502.9K</div>
+    <div class="note">из них 4517 уже продан за $327K</div>
+  </div>
+</div>
+
+<!-- Main ABC table -->
+<div class="section-title">Объекты ABC — по каждому</div>
+<div class="section-desc">Invoice = накопленные счета подрядчиков. Credit Card = остаток по корп. карте на объекте. Available = свободный лимит банковской линии. Статус «Over» = разрыв покрытия.</div>
+
+<div class="table-wrap">
+<table class="data">
+  <thead>
+    <tr>
+      <th>#</th><th>Объект</th>
+      <th class="num">Invoices</th><th class="num">Credit Card</th><th class="num">Total debt</th>
+      <th class="num">Available</th><th class="num">Gap</th><th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>5964 Bayview</td>
+      <td class="num">$74,817</td><td class="num">$10,725</td><td class="num">$85,542</td>
+      <td class="num">$81,274</td><td class="num cell-warning">−$4,268</td>
+      <td><span class="status tight">Tight</span></td>
+    </tr>
+    <tr><td>2</td><td>5966 Bayview</td>
+      <td class="num">$81,541</td><td class="num">$5,355</td><td class="num">$86,896</td>
+      <td class="num">$66,150</td><td class="num cell-danger">−$20,746</td>
+      <td><span class="status over">Over</span></td>
+    </tr>
+    <tr><td>3</td><td>4219 W Bay</td>
+      <td class="num">$16,104</td><td class="num">$55</td><td class="num">$16,159</td>
+      <td class="num">$17,344</td><td class="num cell-success">+$1,185</td>
+      <td><span class="status active">OK</span></td>
+    </tr>
+    <tr><td>4</td><td>4555 26th Ave</td>
+      <td class="num">$28,483</td><td class="num">$1,002</td><td class="num">$29,485</td>
+      <td class="num">$1,250</td><td class="num cell-danger">−$28,235</td>
+      <td><span class="status over">Over</span></td>
+    </tr>
+    <tr><td>5</td><td>4527 26th Ave</td>
+      <td class="num">$21,416</td><td class="num">$1,109</td><td class="num">$22,525</td>
+      <td class="num">$0</td><td class="num cell-danger">−$22,525</td>
+      <td><span class="status over">Over · лимит 0</span></td>
+    </tr>
+    <tr><td>6</td><td>4543 26th Ave</td>
+      <td class="num">$23,307</td><td class="num">$956</td><td class="num">$24,263</td>
+      <td class="num">$8,106</td><td class="num cell-danger">−$16,157</td>
+      <td><span class="status over">Over</span></td>
+    </tr>
+    <tr><td>7</td><td>4535 26th Ave</td>
+      <td class="num">$7,141</td><td class="num">$4,194</td><td class="num">$11,335</td>
+      <td class="num">$1,250</td><td class="num cell-danger">−$10,085</td>
+      <td><span class="status over">Over</span></td>
+    </tr>
+    <tr><td>8</td><td>4517 26th Ave</td>
+      <td class="num">$420</td><td class="num">$125</td><td class="num">$545</td>
+      <td class="num">—</td><td class="num cell-success">sold</td>
+      <td><span class="status sold">Sold $327K</span></td>
+    </tr>
+    <tr><td>9</td><td>6282 10th Ave</td>
+      <td class="num">$6,988</td><td class="num">$0</td><td class="num">$6,988</td>
+      <td class="num">—</td><td class="num cell-success">sold</td>
+      <td><span class="status sold">Sold</span></td>
+    </tr>
+    <tr><td>10</td><td>6018 Kipps</td>
+      <td class="num">$7,595</td><td class="num">$0</td><td class="num">$7,595</td>
+      <td class="num">—</td><td class="num cell-success">sold</td>
+      <td><span class="status sold">Sold</span></td>
+    </tr>
+    <tr class="tot">
+      <td></td><td>ИТОГО</td>
+      <td class="num">$267,811</td><td class="num">$23,521</td><td class="num">$291,332</td>
+      <td class="num">$175,374</td><td class="num cell-danger">−$115,958</td>
+      <td><span class="status over">Разрыв</span></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Additional invoices -->
+<div class="section-title">Дополнительные инвойсы (не по основному пулу)</div>
+<div class="section-desc">Три позиции вне матрицы ABC. Проверить принадлежность и решение по оплате.</div>
+
+<div class="table-wrap">
+<table class="data">
+  <thead><tr><th>Адрес</th><th class="num">Сумма</th><th>Решение / статус</th></tr></thead>
+  <tbody>
+    <tr><td>212 W Ross Ave, Tampa</td><td class="num">$21,775</td><td>К оплате (уточнить срок)</td></tr>
+    <tr><td>806 1st St, IRB Unit 1</td><td class="num">$13,040</td><td>К оплате (уточнить срок)</td></tr>
+    <tr><td>1425 8th Street, Sarasota</td><td class="num">$10,071</td><td class="cell-danger">⚠ не оплачивать — причина требует аудита</td></tr>
+    <tr class="tot"><td>ИТОГО</td><td class="num">$44,886</td><td>Часть блока «Total $83,341» из источника</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Pain points -->
+<div class="section-title">Болевые точки ABC</div>
+<div class="section-desc">Приоритизация через crisis management: остановить кровотечение → закрыть разрыв → навести порядок.</div>
+
+<div class="pain-grid">
+
+  <div class="pain-card red">
+    <div class="pc-cat">🔴 P0 · Кровотечение</div>
+    <h3>Invoice-холд по 5 объектам over-limit</h3>
+    <p>5966 Bayview, 4555, 4527, 4543, 4535 — доступного лимита либо нет, либо не хватает. Общий over = <strong>$97.7K</strong>.</p>
+    <ul>
+      <li>Остановить приём новых инвойсов подрядчиков по этим объектам без письменного approval</li>
+      <li>Связаться с банком: расширение линии / временный override / переброс лимита с других объектов</li>
+      <li>Приоритизировать оплату: critical-path подрядчики первыми, non-critical — пауза</li>
+    </ul>
+  </div>
+
+  <div class="pain-card red">
+    <div class="pc-cat">🔴 P0 · Sold, но долг остался</div>
+    <h3>Входящий cash от 4517 ($327K) — куда?</h3>
+    <p>Объект 4517 продан за $327,494. Решение по распределению:</p>
+    <ul>
+      <li><strong>Первым делом</strong> закрыть over-limit объекты ($97.7K) — снять угрозу разрывов</li>
+      <li>Остаток — на рефинансирование кредитной линии и buffer</li>
+      <li>Зафиксировать transaction trail: из sale → into debts — аудит-готово</li>
+    </ul>
+  </div>
+
+  <div class="pain-card yellow">
+    <div class="pc-cat">🟡 Лимит нулевой</div>
+    <h3>4527 26th Ave — лимит $0 при долге $22.5K</h3>
+    <p>Объект не имеет доступного банковского лимита. Все дальнейшие счета идут «в воздух» — либо собственными деньгами, либо задержкой подрядчика.</p>
+    <ul>
+      <li>Проверить статус объекта — почему лимит обнулён?</li>
+      <li>Согласовать с банком новый draw / восстановление линии</li>
+      <li>Пока не восстановлено — стоп новых работ</li>
+    </ul>
+  </div>
+
+  <div class="pain-card yellow">
+    <div class="pc-cat">🟡 Аудит-след</div>
+    <h3>«Не оплачивать» по 1425 8th Street</h3>
+    <p>Инвойс $10,071 помечен «не оплачивать». Без письменного обоснования это риск:</p>
+    <ul>
+      <li>Подрядчик может предъявить lien на объект</li>
+      <li>Может вылиться в суд / спор</li>
+      <li>Нужно зафиксировать: почему не оплачиваем, что предложено взамен, кто решил</li>
+    </ul>
+  </div>
+
+  <div class="pain-card yellow">
+    <div class="pc-cat">🟡 Концентрация</div>
+    <h3>Четыре 26th Ave — риски соседства</h3>
+    <p>4555 / 4527 / 4543 / 4535 — одна улица, один контекст. Если проблема одна (подрядчик, permit, спор) — бьёт сразу по всем.</p>
+    <ul>
+      <li>Разделить проектные команды по объектам</li>
+      <li>Общий риск-регистр по улице — пересмотр 1 раз в 2 недели</li>
+      <li>Мониторинг: общие поставщики, общие permits</li>
+    </ul>
+  </div>
+
+  <div class="pain-card green">
+    <div class="pc-cat">🟢 Plus</div>
+    <h3>Что защищает</h3>
+    <ul>
+      <li>3 объекта <strong>проданы</strong> — входящий кэш решает большую часть over-limit</li>
+      <li>Sales на $502.9K — реальный приток в ближайшие кварталы</li>
+      <li>Рост «Собственных средств» в основном P&amp;L (см. <a href="portfolio_dashboard.html" style="color:var(--success-text); font-weight:700;">Дэшборд портфеля</a>)</li>
+      <li>Разрыв $115K — управляемый при нормальном закрытии 4517 / 6282 / 6018</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Action plan -->
+<div class="section-title">Action plan — 14 / 30 / 60 дней</div>
+
+<div class="pain-grid">
+  <div class="pain-card red">
+    <div class="pc-cat">14 дней (до 6 мая)</div>
+    <h3>Стабилизация</h3>
+    <ul>
+      <li>Invoice-холд по 5 over-объектам</li>
+      <li>Встреча с банком: расширение линии / override</li>
+      <li>Подтвердить даты поступления от 4517 / 6282 / 6018</li>
+      <li>Решение по 1425 8th Street (письменно)</li>
+    </ul>
+  </div>
+  <div class="pain-card yellow">
+    <div class="pc-cat">30 дней (до 22 мая)</div>
+    <h3>Закрытие разрыва</h3>
+    <ul>
+      <li>$115K разрыв закрыт через cash от продаж + расширение линии</li>
+      <li>Approved-list подрядчиков по каждому объекту</li>
+      <li>Еженедельный re-forecast по ABC</li>
+    </ul>
+  </div>
+  <div class="pain-card green">
+    <div class="pc-cat">60 дней (до 21 июня)</div>
+    <h3>Порядок</h3>
+    <ul>
+      <li>Все объекты в лимите / с buffer ≥10%</li>
+      <li>Дашборд ABC обновляется раз в 2 недели</li>
+      <li>Интеграция данных в JT (trigger для alerts)</li>
+      <li>Процесс approval инвойсов формализован</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  KH Build LLC · ABC Projects · Источник: KH Build Прогноз от 16 Apr 2026 · Конфиденциально
+</div>
+
+</div>
+</div>
+<script>
+// Access gate — same password as salary page
+// Current password: khbuild-salary-2026
+var PW_HASH = '012fdc1d899e835238862a0151e6b7de06f340fb379d8da7fa5f84889eeaba39';
+var STORAGE_KEY = 'kh-abc-unlocked-v1';
+
+async function sha256Hex(s) {
+  var buf = new TextEncoder().encode(s);
+  var hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
+
+function unlock() {
+  document.getElementById('lock-overlay').style.display = 'none';
+  document.getElementById('gated-content').classList.add('unlocked');
+  try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch(e) {}
+}
+
+try { if (sessionStorage.getItem(STORAGE_KEY) === '1') { unlock(); } } catch(e) {}
+
+document.getElementById('lock-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var pw = document.getElementById('lock-pw').value;
+  var err = document.getElementById('lock-err');
+  err.textContent = '';
+  try {
+    var h = await sha256Hex(pw);
+    if (h === PW_HASH) {
+      unlock();
+    } else {
+      err.textContent = 'Неверный пароль';
+      document.getElementById('lock-pw').value = '';
+    }
+  } catch(ex) {
+    err.textContent = 'Ошибка: ' + ex.message;
+  }
+});
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — Дэшборд продаж</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  /* Light theme — KH Build (default) */
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --surface2: #F5F3EE;
+  --border: #E0DDD3;
+  --text: #1A1A1A;
+  --muted: #6B6A65;
+  --accent: #C9A65D;
+  --dark-section: #1A1A1A;
+  --on-dark: #F5F3EE;
+  --danger: #C0392B;
+  --success: #1D9E75;
+  --warning: #D4850F;
+  --danger-bg: #FCEEEC;
+  --success-bg: #E8F8F0;
+  --warning-bg: #FEF3E0;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg: #141414;
+  --card: #1F1F1F;
+  --surface2: #292826;
+  --border: #38342A;
+  --text: #F5F3EE;
+  --muted: #9A938A;
+  --accent: #C9A65D;
+  --dark-section: #0B0B0B;
+  --on-dark: #F5F3EE;
+  --danger: #ef4444;
+  --success: #22c997;
+  --warning: #f59e0b;
+  --danger-bg: rgba(239,68,68,0.14);
+  --success-bg: rgba(34,201,151,0.14);
+  --warning-bg: rgba(245,158,11,0.14);
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Montserrat',-apple-system,sans-serif; font-weight:400; background:var(--bg); color:var(--text); line-height:1.6; }
+.container { max-width:1200px; margin:0 auto; padding:24px; }
+
+/* Theme toggle */
+.theme-toggle {
+  position:fixed;top:18px;right:18px;z-index:1000;
+  width:42px;height:42px;border-radius:50%;
+  border:2px solid var(--accent);background:var(--dark-section);color:var(--accent);
+  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);transition:transform .2s,background .2s;
+  font-family:inherit;
+}
+.theme-toggle:hover{transform:scale(1.1);background:var(--accent);color:var(--dark-section);}
+[data-theme="dark"] .theme-toggle__light{display:none;}
+[data-theme="light"] .theme-toggle__dark,:root:not([data-theme="dark"]) .theme-toggle__dark{display:none;}
+
+/* Header */
+.header {
+  text-align:center; padding:56px 24px 40px; margin:-24px -24px 40px;
+  background:var(--dark-section); color:var(--on-dark);
+  border-bottom:3px solid var(--accent);
+}
+.header .logo { font-size:22px; letter-spacing:6px; color:var(--accent); margin-bottom:16px; font-weight:800; }
+.header h1 { font-size:30px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--on-dark); margin-bottom:10px; }
+.header .subtitle { color:#B8B5AA; font-size:14px; letter-spacing:0.5px; }
+.header .back {
+  display:inline-block; padding:10px 22px; background:var(--accent); color:var(--dark-section);
+  border-radius:4px; text-decoration:none; font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.5px; margin-top:24px; transition:opacity .2s;
+}
+.header .back:hover { opacity:0.85; }
+
+/* Section */
+.section-title { font-size:22px; font-weight:700; margin:48px 0 16px; padding-bottom:10px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:1px; }
+.section-desc { color:var(--muted); font-size:14px; margin-bottom:20px; }
+
+/* KPIs */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-bottom:32px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:4px; padding:18px 20px; text-align:center; box-shadow:var(--shadow); }
+.kpi .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-weight:600; }
+.kpi .value { font-size:28px; font-weight:700; }
+.kpi .note { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi.success .value { color:var(--success); }
+.kpi.warning .value { color:var(--warning); }
+.kpi.accent .value { color:var(--accent); }
+
+/* Table */
+.deal-table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--border); border-radius:4px; overflow:hidden; box-shadow:var(--shadow); font-size:12px; }
+.deal-table th { background:var(--surface2); color:var(--text); font-weight:700; text-align:left; padding:12px 10px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:0.5px; font-size:10px; white-space:nowrap; }
+.deal-table td { padding:10px; border-bottom:1px solid var(--border); vertical-align:top; }
+.deal-table tr:hover td { background:var(--surface2); }
+.deal-table .status-signed { color:var(--success); font-weight:700; }
+.deal-table .status-pending { color:var(--warning); font-weight:600; }
+.deal-table .prob { font-weight:600; }
+.deal-table .fee { font-weight:600; }
+.deal-table .note { color:var(--muted); font-size:11px; line-height:1.5; }
+.deal-table tfoot td { background:var(--dark-section); color:var(--on-dark); font-weight:700; padding:14px 10px; border-top:3px solid var(--accent); font-size:13px; }
+
+/* Chart block */
+.chart-wrap { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:24px; box-shadow:var(--shadow); margin-bottom:24px; }
+.chart-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:16px; }
+.bar-row { display:flex; align-items:center; gap:12px; padding:6px 0; font-size:12px; }
+.bar-row .bar-label { min-width:180px; font-weight:500; }
+.bar-row .bar-track { flex:1; background:var(--surface2); border-radius:3px; height:20px; position:relative; overflow:hidden; }
+.bar-row .bar-fill { height:100%; background:var(--accent); border-radius:3px; transition:width .6s; }
+.bar-row .bar-val { min-width:110px; text-align:right; font-weight:600; color:var(--muted); font-size:11px; }
+
+/* Timing cards */
+.timing-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:14px; }
+.timing-card { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:4px; padding:18px 20px; box-shadow:var(--shadow); }
+.timing-card h3 { font-size:14px; font-weight:700; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+.timing-card .when { font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:0.8px; font-weight:600; margin-bottom:8px; }
+.timing-card p { font-size:12px; color:var(--muted); line-height:1.7; }
+
+/* Footer */
+.footer {
+  text-align:center; padding:32px 24px; margin:48px -24px -24px;
+  color:var(--on-dark); font-size:12px; letter-spacing:0.5px;
+  background:var(--dark-section); border-top:3px solid var(--accent);
+}
+
+/* Mobile optimization */
+@media (max-width:768px) {
+  .container { padding:14px; }
+  .header { padding:32px 16px 24px; margin:-14px -14px 24px; }
+  .header h1 { font-size:20px; letter-spacing:0.5px; }
+  .header .subtitle { font-size:11px; line-height:1.5; }
+  .header .logo { font-size:18px; letter-spacing:4px; margin-bottom:12px; }
+  .header .back { padding:8px 14px; font-size:10px; margin-top:16px; }
+  .section-title { font-size:16px; margin:28px 0 10px; }
+  .section-desc { font-size:12px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .kpi { padding:12px 14px; }
+  .kpi .value { font-size:20px; }
+  .kpi .label { font-size:10px; }
+  .kpi .note { font-size:10px; }
+  .deal-table { font-size:10px; }
+  .deal-table th, .deal-table td { padding:6px 5px !important; }
+  .deal-table .note { font-size:10px; }
+  .chart-wrap { padding:14px; }
+  .chart-title { font-size:12px; }
+  .bar-row { gap:6px; font-size:11px; flex-wrap:wrap; }
+  .bar-row .bar-label { min-width:auto; flex:1 1 100%; font-size:11px; }
+  .bar-row .bar-val { min-width:auto; font-size:10px; flex:1 1 auto; }
+  .timing-grid { grid-template-columns:1fr; gap:10px; }
+  .timing-card { padding:14px 16px; }
+  .timing-card h3 { font-size:13px; }
+  .timing-card p { font-size:11px; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+  .footer { padding:20px 16px; margin:32px -14px -14px; font-size:10px; line-height:1.6; }
+}
+@media (max-width:420px) {
+  .kpi-grid { grid-template-columns:1fr; }
+  .header h1 { font-size:18px; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+
+<div class="container">
+
+<div class="header">
+  <div class="logo">KH BUILD</div>
+  <h1>Дэшборд продаж</h1>
+  <div class="subtitle">Статус воронки на 6 апреля 2026 · Reality check по объёму продаж</div>
+  <a class="back" href="index.html">← Назад к карте процессов</a>
+</div>
+
+<!-- Reality-check callout -->
+<div style="background:var(--warning-bg); border:1px solid rgba(212,133,15,0.4); border-left:4px solid var(--warning); border-radius:4px; padding:18px 22px; margin-bottom:20px; box-shadow:var(--shadow);">
+  <div style="font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--warning-text); margin-bottom:8px;">⚠ Reality check</div>
+  <div style="font-size:13px; line-height:1.7;">
+    Эта страница — только про <strong>активную воронку</strong> из <strong>9 pending сделок</strong> на $1.578M номинального fee. Подписанные сделки (Karen, Victor, Jason #1) <strong>перенесены в портфель</strong>, чтобы не дублировать данные. 100%-probability у неподписанных (Alan &amp; Mary) — это ранняя стадия переговоров, не продажа. Реалистичный диапазон дохода 2026 от pending воронки — <strong>$500–800K fee</strong> при конверсии 30–40%.
+    <br><br>
+    Текущее производство по <strong>14 проектам</strong> (включая 3 только что подписанных), помесячный банковский остаток, burn и crisis playbook — см. <a href="portfolio_dashboard.html" style="color:var(--warning-text); font-weight:700;">Дэшборд портфеля</a>.
+  </div>
+</div>
+
+<!-- KPIs: active funnel only (no duplication with portfolio) -->
+<div class="kpi-grid">
+  <div class="kpi accent">
+    <div class="label">Активная воронка</div>
+    <div class="value">9</div>
+    <div class="note">pending сделок, 0 signed (перенесены в портфель)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Номинальный fee pending</div>
+    <div class="value">$1.58M</div>
+    <div class="note">сумма fee по 9 сделкам · ориентир, не прогноз</div>
+  </div>
+  <div class="kpi warning">
+    <div class="label">Hot pending (75-100%)</div>
+    <div class="value">3</div>
+    <div class="note">Alan &amp; Mary · Joe Ebanks · Laura Travison</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Реалистичная цель 2026</div>
+    <div class="value">$500–800K</div>
+    <div class="note">fee при конверсии 30–40% от pending</div>
+  </div>
+  <div class="kpi success">
+    <div class="label">Уже в портфеле</div>
+    <div class="value">3 · $480K</div>
+    <div class="note">Karen · Victor · Jason #1 → <a href="portfolio_dashboard.html" style="color:var(--success);">портфель →</a></div>
+  </div>
+</div>
+
+<!-- Deals table -->
+<div class="section-title">Перенесены в портфель</div>
+<div class="section-desc">3 подписанные сделки ушли из воронки в <a href="portfolio_dashboard.html" style="color:var(--accent); font-weight:700;">Дэшборд портфеля →</a> и считаются там. В таблице воронки ниже <strong>не дублируются</strong>.</div>
+
+<div style="background:var(--card); border:1px solid var(--border); border-left:4px solid var(--success); border-radius:4px; padding:14px 20px; margin-bottom:24px; box-shadow:var(--shadow); font-size:12px; line-height:1.8;">
+  <strong style="color:var(--success-text);">✓ Перенесены:</strong>
+  Karen &amp; Jeremy Hantman · 5118 31st Ave S · $130K fee ·
+  <span style="color:var(--muted);">|</span>
+  Victor Tonas &amp; Wendy · 1807 Pass A Grille Way · $200K fee ·
+  <span style="color:var(--muted);">|</span>
+  Jason Matthews · 301 161st Ave Redington · $150K fee
+  <br>
+  <span style="color:var(--muted); font-size:11px;">Total перенесено: $480K fee · $17K депозиты · учтены в помесячном cashflow портфеля.</span>
+</div>
+
+<div class="section-title">Активная воронка · 9 сделок</div>
+<div class="section-desc">Сделки без подписанного контракта (pending). Probability — оценка sales-команды по стадии обсуждения; столбец «Реально?» — взгляд с точки зрения cash-flow (наличие контракта и денег в кассе).</div>
+
+<div style="overflow-x:auto;">
+<table class="deal-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Модель</th>
+      <th>Клиент</th>
+      <th>Адрес</th>
+      <th>Construction Fee</th>
+      <th>Prob (sales)</th>
+      <th>Контракт</th>
+      <th>Депозит</th>
+      <th>Реально?</th>
+      <th>Примечание / Next step</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- ====== HOT PENDING — 100% в оценке, но ещё не signed ====== -->
+    <tr>
+      <td>1</td>
+      <td>Custom</td>
+      <td>Alan and Mary</td>
+      <td>Tierra Verde</td>
+      <td class="fee">$150,000</td>
+      <td class="prob" style="color:var(--success);">100%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--warning); font-weight:700;">НЕТ</td>
+      <td class="note">Покупают участок в Tierra Verde. Alan прислал эскизы. Бюджет $1.5M (Land + Build). Если участок $0.5M — денег должно хватить. Для cash-flow учёта: <strong>контракт пока не подписан, депозита нет, участок не куплен</strong> — это активный прогресс, но ещё не сделка.</td>
+    </tr>
+    <!-- ====== ACTIVE PENDING — 75% ====== -->
+    <tr>
+      <td>2</td>
+      <td>Custom</td>
+      <td>Joe Ebanks &amp; Gil Livingston</td>
+      <td>16203 1st St E, Redington Beach</td>
+      <td class="fee">$203,000</td>
+      <td class="prob" style="color:var(--success);">75%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td>прогресс</td>
+      <td class="note">Talked to Gil, 20 марта. Structural в задержке, follow up через 2 недели. Want to build one more lot if one deal is lost. Активная фаза.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Custom</td>
+      <td>Laura Travison</td>
+      <td>1145 Boca Ciega Isle</td>
+      <td class="fee">$200,000</td>
+      <td class="prob" style="color:var(--success);">75%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td>прогресс</td>
+      <td class="note">Отправили Architectural Contract template. Ждём её комментарии до 13 апреля. Активная фаза.</td>
+    </tr>
+    <!-- ====== MEDIUM PENDING — 50% ====== -->
+    <tr>
+      <td>4</td>
+      <td>Redington</td>
+      <td>Jason Matthews</td>
+      <td>15664 1st E, Redington Beach</td>
+      <td class="fee">$150,000</td>
+      <td class="prob">50%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--muted);">зависит</td>
+      <td class="note">Jason нашёл инвестора и готов начать архитектуру. <strong>Зависит от возобновления проекта #3 (Jason #1 сейчас на паузе).</strong> Если #3 не возобновится — #7 под вопросом.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Custom</td>
+      <td>Timothy</td>
+      <td>206 Poinsiana</td>
+      <td class="fee">$200,000</td>
+      <td class="prob">50%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--muted);">wait-and-see</td>
+      <td class="note">Met с Conor (realtor) и Timothy (owner). Делают offer на 206 Poinciana, ждём acceptance. Wait-and-see.</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Huron (TBD)</td>
+      <td>Katherine King</td>
+      <td>9301 Sun Isle Drive NE</td>
+      <td class="fee">$150,000</td>
+      <td class="prob">50%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--muted);">сложный</td>
+      <td class="note">Zoning NS-1, 24 ft max, Design Flood Elevation, no breakaway walls. Рекомендуются модели: Huron 1919 Arrowhead, Huron 2 1935 Shore Acres, Custom с RIOS. Технически сложный кейс.</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Custom</td>
+      <td>Karen and Dave</td>
+      <td>TBD</td>
+      <td class="fee">$200,000</td>
+      <td class="prob">50%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--muted);">early</td>
+      <td class="note">Met at office Apr 8. Annie Quinn — realtor. Ищут участок за $1.1M. Walkthru домов на неделе 13 апреля. Ранняя стадия.</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Huron</td>
+      <td>Alex Bacon</td>
+      <td>TBD</td>
+      <td class="fee">$150,000</td>
+      <td class="prob">50%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--muted);">early</td>
+      <td class="note">Ищет участок в South Tampa. Euclid ушёл в Pending до его offer. Walked thru 1919 Arrowhead и 1935 Shore Acres. Встреча в офисе Apr 15 с Alex и realtor.</td>
+    </tr>
+    <!-- ====== LOW PENDING — 25% ====== -->
+    <tr style="background:rgba(212,133,15,0.05);">
+      <td>9</td>
+      <td>Custom</td>
+      <td>Susan Armon</td>
+      <td>1720 Grand Central</td>
+      <td class="fee">$175,000</td>
+      <td class="prob" style="color:var(--warning);">25%</td>
+      <td class="status-pending">— Pending</td>
+      <td>—</td>
+      <td style="color:var(--warning);">маловероятно</td>
+      <td class="note">Дизайнит свою модель в Tarpon Springs. Нужны arch &amp; budgeting help. Встреча Apr 15 в 1935 Shore Acres. Низкая prob — разрабатывает самостоятельно.</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr style="background:var(--surface2);">
+      <td colspan="4" style="text-align:right;"><strong>PENDING · активная воронка</strong></td>
+      <td class="fee"><strong>$1,578,000</strong></td>
+      <td></td>
+      <td>9 pending · 0 signed</td>
+      <td>—</td>
+      <td></td>
+      <td style="color:var(--muted);">Без подписанных (signed перенесены в портфель)</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+<!-- Probability breakdown -->
+<div class="section-title">Расшифровка по реальности</div>
+<div class="section-desc">Три слоя воронки: активные контракты, контракт на паузе, pending pipeline. Взвешенные цифры — ориентир, а не кэш-флоу; реальные деньги — депозиты в кассе.</div>
+
+<div class="chart-wrap">
+  <div class="chart-title">Pending сделки по sales-probability</div>
+
+  <div class="bar-row">
+    <div class="bar-label">100% — Alan &amp; Mary (НЕ signed!)</div>
+    <div class="bar-track"><div class="bar-fill" style="width:10%; background:var(--warning);"></div></div>
+    <div class="bar-val">$150K · $150K «взв.» — это не продажа</div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">75% — Joe Ebanks &amp; Gil, Laura Travison</div>
+    <div class="bar-track"><div class="bar-fill" style="width:26%; background:var(--success);"></div></div>
+    <div class="bar-val">$403K · $302K взв.</div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">50% — 5 сделок (Jason #2, Timothy, Katherine, Karen &amp; Dave, Alex)</div>
+    <div class="bar-track"><div class="bar-fill" style="width:54%; background:var(--accent);"></div></div>
+    <div class="bar-val">$850K · $425K взв.</div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">25% — Susan Armon</div>
+    <div class="bar-track"><div class="bar-fill" style="width:11%; background:var(--warning);"></div></div>
+    <div class="bar-val">$175K · $44K взв.</div>
+  </div>
+
+  <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:12px;">
+    <span style="color:var(--muted); text-transform:uppercase; letter-spacing:0.8px;">Итого pending / взвешенно (sales-оценка)</span>
+    <span style="font-weight:700; color:var(--accent);">$1,578,000 · ~$921K</span>
+  </div>
+  <div style="margin-top:6px; font-size:11px; color:var(--warning-text); font-style:italic;">Методологическое замечание: 100%-probability у ещё неподписанной сделки (Alan &amp; Mary) отражает уверенность sales-команды в намерении клиента. Для cash-flow прогноза используем скорректированную оценку: без подписанного контракта вероятность закрытия — 50–60%, не 100%.</div>
+</div>
+
+<div class="chart-wrap">
+  <div class="chart-title">Pending fee — разбивка по вероятности</div>
+
+  <div class="bar-row">
+    <div class="bar-label">🔥 Hot (75–100%) · 3 сделки</div>
+    <div class="bar-track"><div class="bar-fill" style="width:35%; background:var(--success);"></div></div>
+    <div class="bar-val">$553K</div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">⚡ Medium (50%) · 5 сделок</div>
+    <div class="bar-track"><div class="bar-fill" style="width:54%; background:var(--warning);"></div></div>
+    <div class="bar-val">$850K</div>
+  </div>
+
+  <div class="bar-row">
+    <div class="bar-label">❄ Low (25%) · 1 сделка</div>
+    <div class="bar-track"><div class="bar-fill" style="width:11%; background:var(--muted);"></div></div>
+    <div class="bar-val">$175K</div>
+  </div>
+
+  <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:12px;">
+    <span style="color:var(--muted); text-transform:uppercase; letter-spacing:0.8px;">Реалистичная цель от воронки к 2026</span>
+    <span style="font-weight:700; color:var(--success);">$500–800K fee (30–40% от pending)</span>
+  </div>
+  <div style="margin-top:6px; font-size:11px; color:var(--muted);">Сделки signed перенесены в <a href="portfolio_dashboard.html" style="color:var(--accent); font-weight:600;">Дэшборд портфеля</a> и учтены там.</div>
+</div>
+
+<!-- Timing of receipts from the pipeline -->
+<div class="section-title">Тайминг · что может превратиться в новые контракты</div>
+<div class="section-desc">Только про активную воронку (9 pending). Поступления по уже подписанным — в <a href="portfolio_dashboard.html" style="color:var(--accent); font-weight:700;">Дэшборде портфеля</a>.</div>
+
+<div class="timing-grid">
+  <div class="timing-card">
+    <div class="when">До 30 апреля · ключевые встречи</div>
+    <h3>Следующие шаги по pending</h3>
+    <p>• <strong>Laura Travison:</strong> ответ на Architectural Contract к 13 апреля.<br>
+      • <strong>Karen &amp; Dave:</strong> walkthru 13 апреля.<br>
+      • <strong>Alex Bacon:</strong> встреча 15 апреля.<br>
+      • <strong>Susan Armon:</strong> встреча 15 апреля.<br>
+      • <strong>Jason #2:</strong> зависит от разморозки Jason #1 (в портфеле).</p>
+  </div>
+  <div class="timing-card">
+    <div class="when">Апрель – Июнь</div>
+    <h3>Новые депозиты — $10–25K реалистично</h3>
+    <p>Кандидаты с высоким prob: Alan &amp; Mary (если найдут участок), Joe Ebanks &amp; Gil (structural разморозится), Laura Travison (если контракт согласован). Ожидаемые депозиты $5–10K с каждого.</p>
+  </div>
+  <div class="timing-card">
+    <div class="when">Май – Август</div>
+    <h3>Конверсия hot сделок в signed</h3>
+    <p>Целевая воронка: из 3 hot (Alan &amp; Mary, Joe Ebanks, Laura) получить <strong>2 подписания</strong>. Из 5 medium (50%) — ещё 1. Итого +3 проекта в портфель к Q3 2026.</p>
+  </div>
+  <div class="timing-card">
+    <div class="when">Цель 2026 от воронки</div>
+    <h3>$500–800K fee</h3>
+    <p>При конверсии 30–40% от $1.578M pending — $474–631K fee добавится к портфелю. Плюс upside от непрогнозируемых лидов. Номинальный $1.58M — это размер воронки, не реалистичный прогноз дохода 2026.</p>
+  </div>
+</div>
+
+<!-- Handoff to portfolio dashboard -->
+<div class="section-title">Следующий шаг · Дэшборд портфеля</div>
+<div class="section-desc">Воронка показывает, что продаётся. Когда сделка подписана и начинает платить — она уходит из воронки в <strong>портфель</strong>. Дэшборд портфеля — это про то, что уже в производстве и как из этого складывается кэш.</div>
+
+<a href="portfolio_dashboard.html" style="display:block; text-decoration:none; background:var(--dark-section); color:var(--on-dark); border-left:4px solid var(--accent); border-radius:4px; padding:22px 26px; margin-bottom:24px; box-shadow:var(--shadow); transition:transform .2s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.transform=''; this.style.boxShadow='var(--shadow)'">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;">
+    <div style="flex:1 1 300px;">
+      <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent); font-weight:700; margin-bottom:6px;">Перейти → Дэшборд портфеля</div>
+      <div style="font-size:18px; font-weight:700; margin-bottom:8px; color:var(--on-dark);">От воронки к производству: 14 проектов, $1.99M fee, помесячный cashflow</div>
+      <div style="font-size:13px; color:#B8B5AA; line-height:1.6;">
+        Банковский остаток APR 2026 · фиксированный burn $61.2K · 8 активных по выручке + 4 в architecture/permitting · pain points и crisis playbook 30/60/90.
+      </div>
+    </div>
+    <div style="font-size:42px; color:var(--accent); font-weight:800;">→</div>
+  </div>
+</a>
+
+<div class="footer">
+  KH Build LLC · Дэшборд продаж · Снапшот на 6 апреля 2026 · Конфиденциально
+</div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

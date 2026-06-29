@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — Export all pages as PDF</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Montserrat',-apple-system,sans-serif; background:#F5F3EE; color:#1A1A1A; }
+
+.status {
+  position:fixed; top:0; left:0; right:0; z-index:10000;
+  background:#1A1A1A; color:#C9A65D;
+  padding:14px 20px; text-align:center;
+  font-weight:700; font-size:13px; letter-spacing:0.5px; text-transform:uppercase;
+  border-bottom:3px solid #C9A65D;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+.status .hint { display:block; font-size:10px; color:#B8B5AA; margin-top:4px; letter-spacing:0.3px; text-transform:none; font-weight:400; }
+.status .actions { margin-top:8px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.status button, .status a {
+  background:#C9A65D; color:#1A1A1A; border:none; padding:6px 16px;
+  border-radius:4px; font-size:11px; font-weight:700; cursor:pointer;
+  text-decoration:none; font-family:inherit; text-transform:uppercase; letter-spacing:0.5px;
+}
+.status button:hover, .status a:hover { opacity:0.85; }
+.status .spinner { display:inline-block; width:10px; height:10px; border:2px solid #C9A65D; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin-right:6px; vertical-align:middle; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.pages { margin-top:88px; padding:0; }
+.page-iframe {
+  width:100%; border:0; display:block; background:#fff;
+  min-height:100vh; /* fallback before JS resize */
+}
+.page-sep {
+  background:#F5F3EE; padding:24px 0; text-align:center;
+  color:#6B6A65; font-size:11px; letter-spacing:1px; text-transform:uppercase;
+}
+
+@media print {
+  body { background:#fff; }
+  .status { display:none !important; }
+  .pages { margin-top:0 !important; }
+  .page-iframe { page-break-after:always; page-break-inside:avoid; }
+  .page-sep { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="status" id="status">
+  <span><span class="spinner"></span>Сборка содержимого… <span id="counter">0/8</span></span>
+  <span class="hint" id="hint">Дождитесь завершения загрузки всех страниц. Затем откроется диалог печати — в нём выберите «Сохранить как PDF» (Save as PDF).</span>
+  <div class="actions" id="actions" style="display:none;">
+    <button onclick="window.print()">📄 Печать / Save as PDF</button>
+    <a href="index.html">← Назад на главную</a>
+  </div>
+</div>
+
+<div class="pages" id="pages">
+  <iframe class="page-iframe" src="index.html" title="Главная"></iframe>
+  <div class="page-sep">Детальное описание проекта</div>
+  <iframe class="page-iframe" src="project_details.html" title="Детальное описание проекта"></iframe>
+  <div class="page-sep">Дэшборд продаж</div>
+  <iframe class="page-iframe" src="sales_dashboard.html" title="Дэшборд продаж"></iframe>
+  <div class="page-sep">Маркетинг</div>
+  <iframe class="page-iframe" src="marketing.html" title="Маркетинг"></iframe>
+  <div class="page-sep">JobTread Migration Plan</div>
+  <iframe class="page-iframe" src="jobtread_migration.html" title="JobTread Migration Plan"></iframe>
+  <div class="page-sep">Граф производственного процесса</div>
+  <iframe class="page-iframe" src="kh_build_process_flowchart.html" title="Граф производственного процесса"></iframe>
+  <div class="page-sep">Telegram Bot Spec</div>
+  <iframe class="page-iframe" src="KH_Build_Telegram_Bot_Spec_v2.html" title="Telegram Bot Spec"></iframe>
+  <div class="page-sep">Дэшборд портфеля проектов</div>
+  <iframe class="page-iframe" src="portfolio_dashboard.html" title="Дэшборд портфеля проектов"></iframe>
+</div>
+
+<script>
+const iframes = document.querySelectorAll('iframe');
+const total = iframes.length;
+let loaded = 0;
+
+function cleanup(iframe) {
+  try {
+    const doc = iframe.contentDocument;
+    if (!doc) return;
+    // Hide theme toggle and navigation buttons
+    doc.querySelectorAll('.theme-toggle').forEach(e => e.style.display = 'none');
+    // Hide navigation buttons in the header (they link to other pages — we're already printing all)
+    doc.querySelectorAll('.header > div[style*="display:flex"]').forEach(e => e.style.display = 'none');
+    doc.querySelectorAll('.header .back').forEach(e => e.style.display = 'none');
+    // For flowchart: force theme light so dark sticky legend doesn't bleed
+    doc.documentElement.setAttribute('data-theme', 'light');
+  } catch(e) {}
+}
+
+function resize(iframe) {
+  try {
+    const doc = iframe.contentDocument;
+    if (!doc) return;
+    const h = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+    iframe.style.height = (h + 40) + 'px';
+  } catch(e) {}
+}
+
+function onAllLoaded() {
+  document.getElementById('status').querySelector('.spinner')?.remove();
+  document.getElementById('hint').textContent = 'Готово. Сейчас откроется диалог печати.';
+  document.getElementById('actions').style.display = 'flex';
+  // Final resize pass (JS-rendered content may have changed height)
+  setTimeout(() => {
+    iframes.forEach(resize);
+    setTimeout(() => window.print(), 800);
+  }, 1000);
+}
+
+iframes.forEach((f) => {
+  f.onload = () => {
+    cleanup(f);
+    // Give JS-rendered content (phases, charts) time to render before measuring
+    setTimeout(() => resize(f), 500);
+    loaded++;
+    document.getElementById('counter').textContent = loaded + '/' + total;
+    if (loaded === total) {
+      onAllLoaded();
+    }
+  };
+});
+
+// Fallback if something stalls: show actions after 20 sec regardless
+setTimeout(() => {
+  if (loaded < total) {
+    document.getElementById('hint').textContent = 'Некоторые страницы не успели загрузиться. Можно запустить печать вручную.';
+    document.getElementById('actions').style.display = 'flex';
+  }
+}, 20000);
+</script>
+</body>
+</html>

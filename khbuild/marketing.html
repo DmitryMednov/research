@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — Маркетинг</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  /* Light theme — KH Build main site palette (default) */
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --surface2: #F5F3EE;
+  --border: #E0DDD3;
+  --text: #1A1A1A;
+  --muted: #6B6A65;
+  --accent: #C9A65D;            /* KH Build gold */
+  --accent-strong: #B38F47;
+  --dark-section: #1A1A1A;      /* dark header/footer strips */
+  --on-dark: #F5F3EE;
+  --danger: #C0392B;
+  --success: #1D9E75;
+  --warning: #D4850F;
+  --ai: #6C41D4;
+  --ai-bg: #F0ECFE;
+  --danger-bg: #FCEEEC;
+  --success-bg: #E8F8F0;
+  --warning-bg: #FEF3E0;
+  --on-accent: #1A1A1A;
+  --on-success: #ffffff;
+  --on-warning: #ffffff;
+  --on-ai: #ffffff;
+  --danger-text: #8B2818;
+  --warning-text: #8B6914;
+  --success-text: #0F6E56;
+  --ai-text: #4A2B96;
+  --sys-bg: #E6F1FB;
+  --sys-text: #185FA5;
+  --danger-border: #E8C4BF;
+  --success-border: #B8E0CB;
+  --ai-border: #D4C8F0;
+  --badge-active-bg: rgba(0,0,0,.25);
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg: #141414;
+  --card: #1F1F1F;
+  --surface2: #292826;
+  --border: #38342A;
+  --text: #F5F3EE;
+  --muted: #9A938A;
+  --accent: #C9A65D;
+  --accent-strong: #D9B870;
+  --dark-section: #0B0B0B;
+  --on-dark: #F5F3EE;
+  --danger: #ef4444;
+  --success: #22c997;
+  --warning: #f59e0b;
+  --ai: #a78bfa;
+  --ai-bg: rgba(167, 139, 250, 0.14);
+  --danger-bg: rgba(239, 68, 68, 0.14);
+  --success-bg: rgba(34, 201, 151, 0.14);
+  --warning-bg: rgba(245, 158, 11, 0.14);
+  --on-accent: #141414;
+  --on-success: #141414;
+  --on-warning: #141414;
+  --on-ai: #141414;
+  --danger-text: #fca5a5;
+  --warning-text: #fcd34d;
+  --success-text: #6ee7b7;
+  --ai-text: #c4b5fd;
+  --sys-bg: rgba(201,166,93,0.14);
+  --sys-text: #D9B870;
+  --danger-border: rgba(239,68,68,0.35);
+  --success-border: rgba(34,201,151,0.35);
+  --ai-border: rgba(167,139,250,0.35);
+  --badge-active-bg: rgba(0,0,0,.35);
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:var(--bg); color:var(--text); line-height:1.6; font-weight:400; }
+.container { max-width:1200px; margin:0 auto; padding:24px; }
+
+/* Header — KH Build dark band with gold logo */
+.header {
+  text-align:center; padding:56px 24px 40px; margin:-24px -24px 40px;
+  background:var(--dark-section); color:var(--on-dark);
+  border-bottom:3px solid var(--accent);
+}
+.header h1 { font-size:30px; font-weight:700; margin-bottom:10px; color:var(--on-dark); text-transform:uppercase; letter-spacing:1px; }
+.header .subtitle { color:#B8B5AA; font-size:14px; letter-spacing:0.5px; }
+.header .logo { font-size:24px; letter-spacing:6px; color:var(--accent); margin-bottom:18px; font-weight:800; }
+
+/* Executive KPIs */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-bottom:32px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:18px 20px; text-align:center; box-shadow:var(--shadow); }
+.kpi .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.kpi .value { font-size:28px; font-weight:600; }
+.kpi .note { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi.danger .value { color:var(--danger); }
+.kpi.success .value { color:var(--success); }
+.kpi.warning .value { color:var(--warning); }
+.kpi.ai .value { color:var(--ai); }
+
+/* Section headers — uppercase bold in KH Build style */
+.section-title { font-size:22px; font-weight:700; margin:48px 0 16px; padding-bottom:10px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:1px; }
+.section-desc { color:var(--muted); font-size:14px; margin-bottom:20px; }
+
+/* Tabs */
+.tabs { display:flex; gap:4px; margin-bottom:24px; flex-wrap:wrap; }
+.tab { padding:10px 16px; border-radius:4px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; border:1px solid var(--border); background:var(--card); color:var(--text); transition:all .2s; user-select:none; font-family:inherit; }
+.tab:hover { background:var(--surface2); border-color:var(--accent); }
+.tab.active { background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+.tab .badge { display:inline-block; background:var(--danger); color:#fff; border-radius:10px; padding:0 6px; font-size:10px; margin-left:4px; font-weight:600; }
+.tab.active .badge { background:var(--badge-active-bg); }
+
+/* Phase content */
+.phase-content { display:none; }
+.phase-content.active { display:block; }
+
+/* Phase header card */
+.phase-header { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:4px; padding:20px 24px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; box-shadow:var(--shadow); }
+.phase-header .phase-name { font-size:18px; font-weight:600; }
+.phase-header .meta { display:flex; gap:16px; flex-wrap:wrap; }
+.meta-item { font-size:12px; color:var(--muted); }
+.meta-item span { font-weight:600; color:var(--text); }
+
+/* Steps */
+.steps { display:flex; flex-direction:column; gap:8px; }
+.step { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:16px 20px; position:relative; cursor:pointer; transition:all .2s; box-shadow:var(--shadow); }
+.step:hover { border-color:var(--accent); }
+.step.bottleneck { border-left:3px solid var(--danger); background:var(--danger-bg); }
+.step.ai-ready { border-left:3px solid var(--ai); }
+.step .step-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.step .step-name { font-weight:500; font-size:14px; }
+.step .step-who { font-size:12px; color:var(--muted); }
+.step .step-note { font-size:13px; color:var(--muted); margin-top:4px; }
+.step .tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+.tag { display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:500; }
+.tag.sys { background:var(--sys-bg); color:var(--sys-text); }
+.tag.bn { background:var(--danger-bg); color:var(--danger); }
+.tag.ai { background:var(--ai-bg); color:var(--ai); }
+.tag.ready { background:var(--success-bg); color:var(--success); }
+
+/* Bottleneck detail */
+.bn-detail { background:var(--danger-bg); border:0.5px solid var(--danger-border); border-radius:8px; padding:12px 16px; margin-top:8px; font-size:13px; color:var(--danger-text); display:none; }
+.step.expanded .bn-detail { display:block; }
+
+/* AI recommendation */
+.ai-detail { background:var(--ai-bg); border:0.5px solid var(--ai-border); border-radius:8px; padding:12px 16px; margin-top:8px; font-size:13px; color:var(--ai-text); display:none; }
+.step.expanded .ai-detail { display:block; }
+
+/* Scalability analysis */
+.scale-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:16px; margin-bottom:32px; }
+.scale-card { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:22px; box-shadow:var(--shadow); }
+.scale-card h3 { font-size:15px; font-weight:600; margin-bottom:8px; }
+.scale-card .person { font-size:13px; color:var(--muted); margin-bottom:12px; }
+.scale-bar { height:8px; background:var(--surface2); border-radius:4px; margin:8px 0; overflow:hidden; }
+.scale-bar .fill { height:100%; border-radius:4px; transition:width .6s; }
+.scale-metric { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:4px; }
+.scale-metric .val { font-weight:600; color:var(--text); }
+
+/* AI Roadmap */
+.roadmap { display:flex; flex-direction:column; gap:16px; }
+.tier { background:var(--card); border:1px solid var(--border); border-radius:4px; overflow:hidden; box-shadow:var(--shadow); }
+.tier-header { padding:16px 20px; font-weight:600; font-size:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+.tier-header .tier-badge { padding:4px 12px; border-radius:8px; font-size:12px; font-weight:600; }
+.tier1 .tier-header { background:var(--success-bg); } .tier1 .tier-badge { background:var(--success); color:var(--on-success); }
+.tier2 .tier-header { background:var(--warning-bg); } .tier2 .tier-badge { background:var(--warning); color:var(--on-warning); }
+.tier3 .tier-header { background:var(--ai-bg); } .tier3 .tier-badge { background:var(--ai); color:var(--on-ai); }
+.tier-body { padding:16px 20px; display:none; }
+.tier.open .tier-body { display:block; }
+.module { display:flex; gap:16px; padding:12px 0; border-bottom:0.5px solid var(--border); align-items:flex-start; }
+.module:last-child { border:none; }
+.module .mod-phase { font-size:11px; color:var(--muted); min-width:80px; }
+.module .mod-name { font-weight:500; font-size:14px; flex:1; }
+.module .mod-impact { font-size:11px; padding:2px 8px; border-radius:6px; white-space:nowrap; }
+.module .mod-impact.high { background:var(--success-bg); color:var(--success); }
+.module .mod-impact.med { background:var(--warning-bg); color:var(--warning); }
+.module .mod-impact.low { background:var(--surface2); color:var(--muted); }
+.module .mod-timeline { font-size:12px; color:var(--muted); min-width:80px; text-align:right; }
+.module .mod-desc { font-size:12px; color:var(--muted); margin-top:4px; }
+
+/* Data coverage */
+.coverage-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:8px; margin-bottom:24px; }
+.cov-item { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:4px; box-shadow:var(--shadow); }
+.cov-item .cov-name { font-size:13px; flex:1; }
+.cov-item .cov-bar { width:80px; height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+.cov-item .cov-bar .fill { height:100%; border-radius:3px; }
+.cov-item .cov-pct { font-size:12px; font-weight:600; min-width:32px; text-align:right; }
+
+/* Stoptactors */
+.stop-list { display:flex; flex-direction:column; gap:8px; }
+.stop-item { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:14px 18px; display:flex; gap:16px; align-items:center; box-shadow:var(--shadow); }
+.stop-item .stop-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.stop-item .stop-icon.crit { background:var(--danger-bg); }
+.stop-item .stop-icon.high { background:var(--warning-bg); }
+.stop-item .stop-icon.med { background:var(--surface2); }
+.stop-item .stop-text h4 { font-size:14px; font-weight:500; }
+.stop-item .stop-text p { font-size:12px; color:var(--muted); }
+.stop-item .stop-solution { font-size:12px; color:var(--success); font-weight:500; min-width:140px; text-align:right; }
+
+/* Theme toggle */
+.theme-toggle {
+  position:fixed; top:18px; right:18px; z-index:1000;
+  width:42px; height:42px; border-radius:50%;
+  border:2px solid var(--accent); background:var(--dark-section); color:var(--accent);
+  font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25); transition:transform .2s, background .2s;
+  font-family:inherit;
+}
+.theme-toggle:hover { transform:scale(1.1); background:var(--accent); color:var(--dark-section); }
+[data-theme="dark"] .theme-toggle__light { display:none; }
+[data-theme="light"] .theme-toggle__dark, :root:not([data-theme="dark"]) .theme-toggle__dark { display:none; }
+
+/* Footer — KH Build dark band */
+.footer {
+  text-align:center; padding:32px 24px; margin:48px -24px -24px;
+  color:var(--on-dark); font-size:12px; letter-spacing:0.5px;
+  background:var(--dark-section); border-top:3px solid var(--accent);
+}
+
+@media (max-width:768px) {
+  .container { padding:14px; }
+  .header { padding:32px 16px 24px; margin:-14px -14px 24px; }
+  .header h1 { font-size:20px; letter-spacing:0.5px; }
+  .header .subtitle { font-size:11px; line-height:1.5; }
+  .header .logo { font-size:18px; letter-spacing:4px; margin-bottom:12px; }
+  .header > div[style*="display:flex"] a { padding:8px 14px !important; font-size:10px !important; }
+  .section-title { font-size:16px; margin:28px 0 10px; }
+  .section-desc { font-size:12px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .kpi { padding:12px 14px; }
+  .kpi .value { font-size:22px; }
+  .kpi .label { font-size:10px; }
+  .kpi .note { font-size:10px; }
+  .scale-grid { grid-template-columns:1fr; gap:12px; }
+  .scale-card { padding:16px; }
+  .scale-card h3 { font-size:14px; }
+  table { font-size:11px !important; display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; }
+  table th, table td { padding:8px 6px !important; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+  .footer { padding:20px 16px; margin:32px -14px -14px; font-size:10px; line-height:1.6; }
+}
+@media (max-width:420px) {
+  .kpi-grid { grid-template-columns:1fr; }
+  .header h1 { font-size:18px; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+
+<div class="container">
+
+<div class="header">
+  <div class="logo">KH BUILD</div>
+  <h1>Маркетинг</h1>
+  <div class="subtitle">KH Build LLC · Статус, задачи, marketing plan, referrals, долгосрочный план · Обновлено 20 апреля 2026 · Конфиденциально</div>
+  <div style="margin-top:22px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+    <a href="index.html" style="display:inline-block; padding:10px 22px; background:var(--accent); color:var(--dark-section); border-radius:4px; text-decoration:none; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; transition:opacity .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">← На главную</a>
+    <a href="project_details.html" style="display:inline-block; padding:10px 22px; background:var(--accent); color:var(--dark-section); border-radius:4px; text-decoration:none; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; transition:opacity .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">📋 Детальное описание →</a>
+  </div>
+</div>
+<!-- Marketing page body -->
+<div class="section-title">Статус, задачи и план масштабирования</div>
+<div class="section-desc">Консолидированный маркетинговый блок: статус-апдейт, текущие задачи с ответственными, marketing plan, подписанные referral-партнёры и операционный план Апрель-Декабрь 2026. Конверсия в сделки — в <a href="sales_dashboard.html" style="color:var(--accent); font-weight:700;">Дэшборде продаж →</a>. Бюджет на marketing в общем burn — в <a href="portfolio_dashboard.html" style="color:var(--accent); font-weight:700;">Дэшборде портфеля →</a>.</div>
+
+<!-- Status update -->
+<div style="background:var(--surface2); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:4px; padding:20px 24px; margin-bottom:20px; box-shadow:var(--shadow);">
+  <div style="font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; color:var(--accent);">Статус-апдейт (на 20 апреля 2026)</div>
+  <div style="font-size:13px; line-height:1.8;">
+    <div style="margin-bottom:10px;"><strong>Сайт khbuild.pro (Аркадий):</strong> <span style="color:var(--success); font-weight:600;">✓ Сдан.</span> Движок WP, хостинг на GoDaddy. Макеты: <a href="https://www.figma.com/design/JNQgGccT5Bs3lnVgp6rgfz/KH-build?node-id=25-2&p=f&t=EyyLnK3v5AFtsMey-0" target="_blank" style="color:var(--accent);">Figma</a>. Старый kelnerhomes.com остаётся «дрейфовать» — не удаляем.</div>
+    <div style="margin-bottom:10px;"><strong>Контент для сайта (Артур):</strong> <span style="color:var(--warning-text); background:var(--warning-bg); padding:2px 8px; border-radius:3px;">Ждём от Артура</span> — наполнение сайта SEO-статьями (экспертный контент для блога). Сайт сдан, контент — следующий шаг.</div>
+    <div style="margin-bottom:10px;"><strong>Видео для YouTube (Аркадий):</strong> Аркадий готовит видео-контент: интервью с клиентами и обзоры построенных домов. Параллельно — нарезка клипов из существующих материалов для Shorts/Reels.</div>
+    <div style="margin-bottom:10px;"><strong>Трафик FB Ads (Денис):</strong> $50/день running + базовая email/SMS автоматизация через GHL. Возможен подъём до $100/день. Теперь, когда сайт сдан, следующий шаг — расширенная GHL-автоматизация (формы сайта → GHL, скоринг лидов, полные follow-up цепочки). ТЗ готовит Дмитрий М.</div>
+    <div><strong>Соцсети и каналы:</strong> <span style="color:var(--warning-text); background:var(--warning-bg); padding:2px 8px; border-radius:3px;">Ждём от Артура</span> — создание новых аккаунтов (FB, IG, YouTube, TikTok, GBP) под бренд KH Build. Отдельно от старых Kelner Homes (согласовано). Также не решён вопрос: кто будет отвечать за наполнение и ведение соц. сетей.</div>
+  </div>
+</div>
+
+<!-- To-Do board by responsible -->
+<div style="font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:1px; margin:24px 0 12px; color:var(--text);">To-Do board · Ближайшие задачи</div>
+<div class="scale-grid">
+  <div class="scale-card">
+    <h3 style="color:var(--accent);">Артур</h3>
+    <div class="person">Sales & Operations · Contentful lead</div>
+    <div style="font-size:13px; line-height:1.7; margin-top:10px;">
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--border);"><span style="color:var(--warning);">●</span><div>Создать новые аккаунты соцсетей: <strong>FB, IG, YouTube, TikTok + GBP</strong> под бренд KH Build</div></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--border);"><span style="color:var(--warning);">●</span><div>Решение по бюджету рекламы: <strong>$50 vs $100/день</strong></div></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--border);"><span style="color:var(--danger);">●</span><div><strong>SEO-статьи</strong> для блога khbuild.pro (экспертный контент) — сайт сдан, ждём наполнения</div></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0;"><span style="color:var(--danger);">●</span><div>Назначить ответственного за ведение соцсетей (<em>открытый вопрос</em>)</div></div>
+    </div>
+  </div>
+
+  <div class="scale-card">
+    <h3 style="color:var(--accent);">Аркадий</h3>
+    <div class="person">Контент · Видео</div>
+    <div style="font-size:13px; line-height:1.7; margin-top:10px;">
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--border);"><span style="color:var(--success);">●</span><div><strong>khbuild.pro</strong> — <strong>✓ сдан</strong></div></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--border);"><span style="color:var(--warning);">●</span><div><strong>Видео для YouTube:</strong> интервью с клиентами и обзоры построенных домов</div></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0;"><span style="color:var(--warning);">●</span><div>Нарезка клипов (Shorts / Reels) из существующих материалов</div></div>
+    </div>
+  </div>
+
+  <div class="scale-card">
+    <h3 style="color:var(--accent);">Дмитрий (@d_mdnv)</h3>
+    <div class="person">Strategy & IT Consultant</div>
+    <div style="font-size:13px; line-height:1.7; margin-top:10px;">
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0;"><span style="color:var(--warning);">●</span><div>Подготовить <strong>ТЗ на GHL-автоматизацию</strong> (сразу после приёмки сайта)</div></div>
+    </div>
+  </div>
+
+  <div class="scale-card">
+    <h3 style="color:var(--accent);">Денис</h3>
+    <div class="person">Трафик · FB Ads · GHL</div>
+    <div style="font-size:13px; line-height:1.7; margin-top:10px;">
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:0.5px solid var(--border);"><span style="color:var(--success);">●</span><div>Продолжает <strong>FB Ads</strong> $50/день</div></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 0;"><span style="color:var(--warning);">●</span><div>Расширенная <strong>GHL-автоматизация</strong> по ТЗ (после сдачи сайта)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Marketing Plan Table -->
+<div style="font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:1px; margin:32px 0 12px;">Marketing Plan · статус</div>
+<div style="background:var(--card); border:1px solid var(--border); border-radius:4px; overflow-x:auto; -webkit-overflow-scrolling:touch; box-shadow:var(--shadow); margin-bottom:20px;">
+  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr style="background:var(--surface2); text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">#</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Пункт</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Комментарий</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Статус</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Ответственный</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">1</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">2 Construction Boards</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Done</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">2</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Referral Architecture</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Done</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">3</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Referral Demo</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">$5K</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">4</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Survey Companies</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">$5K</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">5</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Sales Agent</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">$10K</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">6</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Referral Realtors</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">$5K</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">7</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">New Marketing</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">Business Cards, Polos, Car Magnets, Wrap</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Done</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">8</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Facebook Ads</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">$50/день — running</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Running</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Денис</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">9</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Developers Meetings & Networking</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--danger); font-weight:600;">● No progress</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Артур</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">10</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);"><strong>Website khbuild.pro</strong></td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">Движок WP, хостинг GoDaddy. Сдан.</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Done</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);"><strong>Аркадий</strong></td></tr>
+      <tr><td style="padding:10px 14px;">11</td><td style="padding:10px 14px;"><strong>New Meta + Google Maps</strong></td><td style="padding:10px 14px; color:var(--muted);">FB, IG, YouTube, TikTok, GBP — новые под бренд KH Build</td><td style="padding:10px 14px; color:var(--accent); font-weight:600;">◷ 15-Apr</td><td style="padding:10px 14px;"><strong>Артур</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Referral Letters signed -->
+<div style="font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:1px; margin:32px 0 12px;">Referral Letters · подписанные партнёры</div>
+<div style="background:var(--card); border:1px solid var(--border); border-radius:4px; overflow-x:auto; -webkit-overflow-scrolling:touch; box-shadow:var(--shadow); margin-bottom:28px;">
+  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr style="background:var(--surface2); text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">#</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Партнёр</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Тип</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Сумма</th>
+        <th style="padding:12px 14px; text-align:left; border-bottom:2px solid var(--accent); font-weight:700;">Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">1</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Mancini</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Architect</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">$10,000</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Signed</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">2</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">RIOS</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Architect</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">$10,000</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Signed</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">3</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">SHIMP</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Surveyor</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">$5,000</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Signed</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">4</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Annie Quinn</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Realtor</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">$10,000</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Signed</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">5</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Conor Green</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Realtor</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">$10,000</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--success); font-weight:600;">✓ Signed</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">6</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Davis Bews</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Architect</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">7</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">AAA Demo</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Demo</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">8</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">PAW</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Demo</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td></tr>
+      <tr><td style="padding:10px 14px; border-bottom:1px solid var(--border);">9</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">DK Demolition</td><td style="padding:10px 14px; border-bottom:1px solid var(--border);">Demo</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--muted);">—</td><td style="padding:10px 14px; border-bottom:1px solid var(--border); color:var(--warning); font-weight:600;">⚡ In process</td></tr>
+      <tr><td style="padding:10px 14px;">10</td><td style="padding:10px 14px;">YES Homes</td><td style="padding:10px 14px;">Realtor</td><td style="padding:10px 14px; color:var(--muted);">—</td><td style="padding:10px 14px; color:var(--warning); font-weight:600;">⚡ In process</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Long-term planning sub-header -->
+<div style="font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:1px; margin:32px 0 12px;">Долгосрочный план масштабирования воронки</div>
+<div style="color:var(--muted); font-size:13px; margin-bottom:16px;">Операционный план Апрель–Декабрь 2026. Бюджет от $1K до $10K/мес. Цель: 3-5 новых контрактов/мес к концу года.</div>
+
+<div class="kpi-grid">
+  <div class="kpi success"><div class="label">Каналов</div><div class="value">5</div><div class="note">Инфлюенсеры, SEO, Ads, SMM, GBP</div></div>
+  <div class="kpi warning"><div class="label">Макс бюджет</div><div class="value">$10K</div><div class="note">/мес к декабрю</div></div>
+  <div class="kpi success"><div class="label">Цель лидов</div><div class="value">35</div><div class="note">/мес к декабрю 2026</div></div>
+  <div class="kpi"><div class="label">CAC ожидаемый</div><div class="value">$2-5K</div><div class="note">Google Ads + SEO mix</div></div>
+  <div class="kpi success"><div class="label">Conv. в сделку</div><div class="value">10-15%</div><div class="note">= 3-5 контрактов/мес</div></div>
+</div>
+
+<div class="scale-grid" style="margin-top:16px;">
+  <div class="scale-card">
+    <h3>Каналы и бюджет</h3>
+    <div style="font-size:13px; line-height:1.8; margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>Микро-инфлюенсеры (доверие + охват)</span><span style="font-weight:600;">до $3K/мес</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>SEO + Контент (органика, long-term)</span><span style="font-weight:600;">до $1K/мес</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>Google Ads Search (быстрые лиды)</span><span style="font-weight:600;">до $2K/мес</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>SMM: Instagram, YouTube, TikTok, FB</span><span style="font-weight:600;">до $1.5K/мес</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>GBP, PR, инфраструктура</span><span style="font-weight:600;">до $2.5K/мес</span></div>
+    </div>
+    <div style="margin-top:12px; font-size:12px; color:var(--muted);">Принцип: старт $1K/мес → рост +$500-1K/мес → потолок $10K. Деньги перераспределяются в пользу каналов с лучшим CPL.</div>
+  </div>
+  <div class="scale-card">
+    <h3>Помесячная динамика</h3>
+    <div style="font-size:13px; line-height:1.8; margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span style="font-weight:500;">АПР-МАЙ: Разгон</span><span>$1-2K → 1-5 лидов</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span style="font-weight:500;">ИЮН-ИЮЛ: Первые результаты</span><span>$3-4.5K → 8-15 лидов</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span style="font-weight:500;">АВГ-СЕН: Системный рост</span><span>$6-7.5K → 15-25 лидов</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0;"><span style="font-weight:500;">ОКТ-ДЕК: Масштаб</span><span>$8.5-10K → 25-35 лидов</span></div>
+    </div>
+    <div style="margin-top:12px; font-size:12px; color:var(--success); font-weight:500;">При конверсии 10-15% = 3-5 новых контрактов/мес к декабрю</div>
+  </div>
+  <div class="scale-card">
+    <h3>Недельный ритм контента</h3>
+    <div style="font-size:13px; line-height:1.8; margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>Статьи на сайт</span><span>2-3/нед.</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>Интеграции с блоггерами</span><span>2-3/нед.</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>YouTube длинные видео</span><span>1-2/нед.</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>Shorts / Reels / TikTok</span><span>5-7/нед.</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:0.5px solid var(--border);"><span>Instagram посты + stories</span><span>4-5/нед.</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>Facebook посты</span><span>3-4/нед.</span></div>
+    </div>
+  </div>
+  <div class="scale-card">
+    <h3>SEO + AI-оптимизация (AIO/GEO)</h3>
+    <div style="font-size:13px; line-height:1.7; margin-top:8px;">
+      <div style="font-weight:500; margin-bottom:6px;">Семантические кластеры:</div>
+      <div style="font-size:12px; color:var(--muted);">
+        "custom home builder St Petersburg FL" • "hurricane rebuild Tampa" • "cost to build a house St Pete" • "Shore Acres homes" • "modern home design Florida" • "flood zone rebuild" • "49% rule substantial improvement"
+      </div>
+      <div style="font-weight:500; margin-top:10px; margin-bottom:6px;">Техн. SEO (приоритеты):</div>
+      <div style="font-size:12px; color:var(--muted);">
+        Meta-теги + Schema Markup (JSON-LD) + FAQ-секции (для AI-поиска ChatGPT/Perplexity) + Core Web Vitals + Sitemap
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  KH Build LLC · Маркетинг · Обновлено 20 апреля 2026 · Конфиденциально
+</div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — Telegram Bot Module Spec v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  /* Light theme — KH Build (default) */
+  --bg: #FFFFFF;
+  --surface: #F5F3EE;
+  --surface2: #EEEBE2;
+  --border: #E0DDD3;
+  --text: #1A1A1A;
+  --text-strong: #0B0B0B;
+  --text-muted: #6B6A65;
+  --accent: #C9A65D;
+  --accent2: #1D9E75;
+  --warn: #D4850F;
+  --danger: #C0392B;
+  --code-bg: #F5F3EE;
+  --dark-section: #1A1A1A;
+  --on-dark: #F5F3EE;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg: #141414;
+  --surface: #1F1F1F;
+  --surface2: #292826;
+  --border: #38342A;
+  --text: #F5F3EE;
+  --text-strong: #FFFFFF;
+  --text-muted: #9A938A;
+  --accent: #C9A65D;
+  --accent2: #22c997;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --code-bg: #0d0d0d;
+  --dark-section: #0B0B0B;
+  --on-dark: #F5F3EE;
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Montserrat',-apple-system,sans-serif; font-weight:400; line-height:1.7; }
+.container { max-width:920px; margin:0 auto; padding:40px 24px 80px; }
+h1 { font-size:2.2rem; font-weight:700; color:var(--text-strong); margin:60px 0 12px; letter-spacing:-0.5px; text-transform:uppercase; }
+h1:first-of-type { margin-top:0; }
+h2 { font-size:1.4rem; font-weight:600; color:var(--accent); margin:40px 0 10px; }
+h3 { font-size:1.1rem; font-weight:600; color:var(--text); margin:28px 0 8px; }
+p { margin:0 0 14px; }
+strong { font-weight:600; color:var(--text-strong); }
+em { color:var(--text-muted); font-style:italic; }
+a { color:var(--accent); }
+
+/* Theme toggle */
+.theme-toggle {
+  position:fixed;top:18px;right:18px;z-index:1000;
+  width:42px;height:42px;border-radius:50%;
+  border:2px solid var(--accent);background:var(--dark-section);color:var(--accent);
+  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);transition:transform .2s,background .2s;
+  font-family:inherit;
+}
+.theme-toggle:hover{transform:scale(1.1);background:var(--accent);color:var(--dark-section);}
+[data-theme="dark"] .theme-toggle__light{display:none;}
+[data-theme="light"] .theme-toggle__dark,:root:not([data-theme="dark"]) .theme-toggle__dark{display:none;}
+
+.hero { text-align:center; padding:60px 24px 40px; border-bottom:3px solid var(--accent); margin:-40px -24px 48px; background:var(--dark-section); color:var(--on-dark); }
+.hero h1 { font-size:2.8rem; margin:0 0 8px; letter-spacing:-0.5px; color:var(--on-dark); }
+.hero .sub { font-size:1.2rem; color:#B8B5AA; margin-bottom:20px; }
+.hero .lang-badge { display:inline-block; background:var(--accent); color:var(--dark-section); font-weight:700; font-size:0.85rem; padding:6px 18px; border-radius:4px; margin-top:12px; letter-spacing:1px; text-transform:uppercase; }
+.hero .meta { color:#9A938A; font-size:0.85rem; margin-top:16px; }
+
+.callout { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); padding:16px 20px; border-radius:0 4px 4px 0; margin:20px 0; box-shadow:var(--shadow); }
+.callout.warn { border-left-color:var(--warn); }
+.callout.danger { border-left-color:var(--danger); }
+.callout.green { border-left-color:var(--accent2); }
+.callout strong { color:var(--accent); }
+.callout.warn strong { color:var(--warn); }
+.callout.danger strong { color:var(--danger); }
+.callout.green strong { color:var(--accent2); }
+
+table { width:100%; border-collapse:collapse; margin:16px 0 24px; font-size:0.88rem; background:var(--surface); border-radius:4px; overflow:hidden; box-shadow:var(--shadow); }
+th { background:var(--surface2); color:var(--text-strong); font-weight:700; text-align:left; padding:12px 14px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:0.5px; font-size:0.78rem; }
+td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+tr:hover td { background:var(--surface2); }
+
+code { font-family:'JetBrains Mono',monospace; font-size:0.82rem; background:var(--code-bg); padding:2px 6px; border-radius:3px; color:var(--accent); border:1px solid var(--border); }
+pre { background:var(--code-bg); border:1px solid var(--border); border-radius:4px; padding:16px 20px; overflow-x:auto; margin:12px 0 20px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; line-height:1.6; color:var(--text); }
+
+.metric-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin:20px 0; }
+.metric { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:16px; text-align:center; box-shadow:var(--shadow); }
+.metric .label { font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-weight:600; }
+.metric .before { font-size:1rem; color:var(--danger); text-decoration:line-through; opacity:0.7; }
+.metric .after { font-size:1.5rem; font-weight:700; color:var(--accent2); }
+.metric .unit { font-size:0.7rem; color:var(--text-muted); }
+
+.toc { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:4px; padding:20px 28px; margin:0 0 40px; box-shadow:var(--shadow); }
+.toc h3 { margin:0 0 12px; color:var(--text-strong); font-size:0.9rem; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+.toc ol { padding-left:20px; }
+.toc li { margin:4px 0; color:var(--text-muted); font-size:0.9rem; }
+.toc a { color:var(--text); text-decoration:none; }
+.toc a:hover { color:var(--accent); }
+
+hr { border:none; border-top:1px solid var(--border); margin:48px 0; }
+
+/* Pipeline diagram */
+.pipeline-diagram { margin:28px auto; max-width:780px; }
+.pd-label { text-align:center; font-size:0.95rem; font-weight:600; color:var(--text); margin-bottom:14px; letter-spacing:0.3px; }
+.pd-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:0; }
+.pd-box {
+  border-radius:8px; padding:14px 16px; text-align:center;
+  border:1.5px solid; position:relative;
+}
+.pd-box .pd-title { font-weight:700; font-size:0.9rem; margin-bottom:3px; }
+.pd-box .pd-sub { font-size:0.75rem; opacity:0.85; line-height:1.35; }
+.pd-input { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.55); color:var(--text); }
+.pd-input .pd-title { color:#0F7A42; }
+[data-theme="dark"] .pd-input .pd-title { color:#5FE39E; }
+.pd-bot { background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.55); color:var(--text); }
+.pd-bot .pd-title { color:#1E4FA5; }
+[data-theme="dark"] .pd-bot .pd-title { color:#7BB0FF; }
+.pd-ai { background:rgba(168,85,247,0.1); border-color:rgba(168,85,247,0.55); color:var(--text); padding:18px 18px 16px; }
+.pd-ai > .pd-title { color:#6B2FB8; margin-bottom:12px; }
+[data-theme="dark"] .pd-ai > .pd-title { color:#C4A0FF; }
+.pd-inner-row { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:10px; }
+.pd-box-inner {
+  background:rgba(244,114,182,0.14); border:1.5px solid rgba(244,114,182,0.55);
+  border-radius:8px; padding:10px 12px; text-align:center;
+}
+.pd-box-inner .pdi-title { font-weight:700; font-size:0.82rem; color:#B3316C; }
+[data-theme="dark"] .pd-box-inner .pdi-title { color:#F8A8CC; }
+.pd-box-inner .pdi-sub { font-size:0.7rem; color:var(--text-muted); line-height:1.35; margin-top:2px; }
+.pd-box-wide { background:rgba(168,85,247,0.14); border-color:rgba(168,85,247,0.5); }
+.pd-box-wide .pdi-title { color:#6B2FB8; }
+[data-theme="dark"] .pd-box-wide .pdi-title { color:#C4A0FF; }
+.pd-jt { background:rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.55); padding:14px 16px 18px; }
+.pd-jt .pd-title { color:#1E4FA5; margin-bottom:12px; }
+[data-theme="dark"] .pd-jt .pd-title { color:#7BB0FF; }
+.pd-chip-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+.pd-chip {
+  background:rgba(245,158,11,0.16); border:1.5px solid rgba(245,158,11,0.55);
+  border-radius:6px; padding:7px 4px; font-size:0.72rem; font-weight:600; text-align:center;
+  color:#A25B0B;
+}
+[data-theme="dark"] .pd-chip { color:#FBC36E; }
+.pd-conf { background:rgba(34,197,94,0.14); border-color:rgba(34,197,94,0.55); }
+.pd-conf .pd-title { color:#0F7A42; }
+[data-theme="dark"] .pd-conf .pd-title { color:#5FE39E; }
+.pd-arrow { width:2px; height:28px; background:var(--border); margin:0 auto; position:relative; }
+.pd-arrow::after {
+  content:''; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%);
+  border-left:5px solid transparent; border-right:5px solid transparent;
+  border-top:7px solid var(--border);
+}
+.pd-arrow-label { margin:6px auto; height:44px; }
+.pd-arrow-label::before {
+  content:attr(data-label); position:absolute; left:calc(50% + 12px); top:50%;
+  transform:translateY(-50%); font-size:0.72rem; color:var(--text-muted);
+  white-space:nowrap; font-style:italic;
+}
+.pd-latency {
+  text-align:center; font-size:0.82rem; color:var(--text-muted);
+  margin-top:18px; font-style:italic; padding-top:14px; border-top:1px dashed var(--border);
+}
+@media(max-width:640px) {
+  .pd-row, .pd-inner-row, .pd-chip-row { grid-template-columns:1fr 1fr; }
+}
+
+/* Mobile optimization */
+@media (max-width:768px) {
+  .container { padding:20px 14px 48px; }
+  .hero { padding:32px 16px 24px; margin:-20px -14px 28px; }
+  .hero h1 { font-size:1.7rem; letter-spacing:-0.3px; }
+  .hero .sub { font-size:0.95rem; margin-bottom:12px; }
+  .hero .lang-badge { font-size:0.7rem; padding:5px 12px; }
+  .hero .meta { font-size:0.72rem; margin-top:10px; }
+  h1 { font-size:1.4rem; margin:36px 0 10px; }
+  h2 { font-size:1.1rem; margin:24px 0 8px; }
+  h3 { font-size:1rem; margin:20px 0 6px; }
+  p { font-size:0.88rem; }
+  .callout { padding:12px 14px; }
+  .callout strong { font-size:0.88rem; }
+  /* Responsive tables: make every table horizontally scrollable */
+  table { display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; font-size:0.78rem; white-space:normal; }
+  table th, table td { padding:7px 8px; font-size:0.78rem; }
+  pre { font-size:0.7rem; padding:12px 14px; }
+  code { font-size:0.76rem; }
+  .metric-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .metric { padding:12px; }
+  .metric .after { font-size:1.15rem; }
+  .metric .label { font-size:0.68rem; }
+  .toc { padding:14px 18px; }
+  .toc li { font-size:0.82rem; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+  .pipeline-diagram { margin:18px auto; }
+  .pd-label { font-size:0.85rem; }
+  .pd-box { padding:10px 12px; }
+  .pd-box .pd-title { font-size:0.8rem; }
+  .pd-box .pd-sub { font-size:0.68rem; }
+  .pd-chip { font-size:0.65rem; padding:6px 4px; }
+  .pd-box-inner .pdi-title { font-size:0.74rem; }
+  .pd-box-inner .pdi-sub { font-size:0.65rem; }
+  .pd-arrow-label::before { font-size:0.65rem; }
+  .pd-latency { font-size:0.75rem; }
+}
+@media (max-width:420px) {
+  .metric-grid { grid-template-columns:1fr; }
+  .hero h1 { font-size:1.4rem; }
+  .pd-row, .pd-inner-row, .pd-chip-row { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+<div class="container">
+
+<div style="margin-bottom:16px;">
+  <a href="index.html" style="display:inline-block; padding:10px 22px; background:var(--accent); color:var(--dark-section); border-radius:4px; text-decoration:none; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; transition:opacity .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">← Назад к карте процессов</a>
+</div>
+
+<div class="hero">
+  <h1>KH Build — Telegram Bot</h1>
+  <div class="sub">Voice + Photo → AI → JobTread + Procurement Alerts</div>
+  <div class="lang-badge">BOT UI LANGUAGE: ENGLISH</div>
+  <div class="meta">Техническая спецификация v2.0 &middot; Апрель 2026 &middot; Дмитрий Меднов &middot; Конфиденциально</div>
+</div>
+
+<div class="toc">
+  <h3>Содержание</h3>
+  <ol>
+    <li><a href="#s1">Влияние на бизнес — зачем</a></li>
+    <li><a href="#s2">Резюме проекта</a></li>
+    <li><a href="#s3">Procurement & Payment Trigger (ключевое)</a></li>
+    <li><a href="#s4">Дизайн бота (английский интерфейс)</a></li>
+    <li><a href="#s5">Архитектура конвейера</a></li>
+    <li><a href="#s6">Промпт структуризатора</a></li>
+    <li><a href="#s7">Примеры из практики</a></li>
+    <li><a href="#s8">Обработка ошибок</a></li>
+    <li><a href="#s9">Система алертов и эскалации</a></li>
+    <li><a href="#s10">План внедрения</a></li>
+  </ol>
+</div>
+
+<div class="callout warn">
+  <strong>⚠ Пререквизит:</strong> миграция на JobTread (завершается ~июнь 2026). JobTread имеет нативное PM mobile-app — PMs могут заполнять daily logs, photos, task updates прямо в нём. Решение о строительстве этого бота — <strong>условное</strong>, принимается после 30–60 дней наблюдения за adoption JT PM app. См. <a href="#s1">раздел 1.3</a> и Шаг 0 в плане внедрения.
+</div>
+
+<!-- ============== SECTION 1 — WHY ============== -->
+<h1 id="s1">1. Влияние на бизнес — зачем мы это делаем</h1>
+
+<p>Текущий бизнес KH Build упирается в «слепую зону» между стройплощадкой и офисом. PM заполняют daily logs в JobTread ~<strong>5% от целевого объёма</strong>, закупки обсуждаются устно на еженедельных встречах, между завершением работ и оплатой подрядчику проходит <strong>3–14 дней</strong>. Из 217 целевых data points покрывается только 32%. Масштабирование с 10 до 16-20 проектов в таком режиме невозможно.</p>
+
+<div class="callout">
+  <strong>Идея проекта:</strong> Telegram-бот устраняет трение между «увидел на площадке» и «занесено в систему». PM говорит 60 секунд → AI структурирует → JobTread обновляется → Алёна и Анастасия получают алерт со списком платежей. Один голосовой отчёт запускает всю цепочку закупок и финконтроля.
+</div>
+
+<h2>1.1 Эффект в цифрах</h2>
+<div class="metric-grid">
+  <div class="metric"><div class="label">Цикл закупки</div><div class="before">6–27 дней</div><div class="after">3–7 дней</div></div>
+  <div class="metric"><div class="label">Daily log полнота</div><div class="before">~5%/нед</div><div class="after">~90%/день</div></div>
+  <div class="metric"><div class="label">Покрытие 217 точек</div><div class="before">32%</div><div class="after">53%→85%</div></div>
+  <div class="metric"><div class="label">Отчёт → оплата</div><div class="before">3–14 дней</div><div class="after">0–1 день</div></div>
+  <div class="metric"><div class="label">Простой/закупки</div><div class="before">2–4 мес</div><div class="after">0.5–1 мес</div></div>
+  <div class="metric"><div class="label">Пропускная PM</div><div class="before">3.3 дома</div><div class="after">4–4.5 дома</div></div>
+</div>
+
+<h2>1.2 Что это даёт бизнесу</h2>
+<table>
+  <tr><th>Метрика</th><th>До</th><th>После</th></tr>
+  <tr><td>Цикл закупки (отчёт PM → материалы)</td><td>6–27 дней</td><td>3–7 дней</td></tr>
+  <tr><td>Полнота daily logs</td><td>~5%, раз/неделю</td><td>~90%, ежедневно</td></tr>
+  <tr><td>Покрытие данных (217 точек)</td><td>32%</td><td>53% (60 дней) → 85% (6 мес)</td></tr>
+  <tr><td>Время от завершения работ до оплаты</td><td>3–14 дней</td><td>0–1 день</td></tr>
+  <tr><td>Простой из-за закупок</td><td>~2–4 мес/проект суммарно</td><td>~0.5–1 мес/проект</td></tr>
+  <tr><td>Пропускная способность PM</td><td>3.3 дома/PM</td><td>4–4.5 домов/PM</td></tr>
+</table>
+
+<div class="callout green">
+  <strong>Главный бизнес-эффект:</strong> сокращение простоев по закупкам на ~2 месяца с проекта × 10 проектов = экономия ~20 месяцев совокупного простоя в год. Пропускная способность команды растёт с 10 до 13-14 домов при тех же 3 PM. Окупаемость — первые 2 устранённые простоя.
+</div>
+
+<h2>1.3 Решение go/no-go — после 30–60 дней наблюдения</h2>
+<p>После завершения миграции команда 30–60 дней работает с нативным JobTread PM mobile-app. Ключевая метрика — <strong>daily log completion rate</strong> (процент рабочих дней с заполненным daily log по каждому из 3 PM). По итогам измерения выбирается один из трёх сценариев.</p>
+<table>
+  <tr><th>Adoption JT PM-app</th><th>Решение</th><th>Что строим</th><th>Стоимость</th></tr>
+  <tr><td>&gt; 60%</td><td>Бот не нужен</td><td>PM-app достаточен. Процесс работает.</td><td>$0 + экономия 35 дней разработки</td></tr>
+  <tr><td>40–60%</td><td>Частичный бот</td><td>Только procurement &amp; payment triggers на middleware (JT → Claude → Alerts для Алёны/Анастасии). Без voice UX и daily logs.</td><td>~$200–450/мес</td></tr>
+  <tr><td>&lt; 40%</td><td>Полный бот</td><td>Текущая спецификация в силе. Voice-first для resistant PMs + procurement triggers.</td><td>$450–965/мес</td></tr>
+</table>
+
+<hr>
+
+<!-- ============== SECTION 2 ============== -->
+<h1 id="s2">2. Резюме проекта</h1>
+
+<p>Модуль голосового Telegram-бота для KH Build — интерфейс, позволяющий прорабам (PM) отправлять отчёты голосом, фото и видео прямо со стройплощадки. Бот обрабатывает сообщения через AI-конвейер (Whisper STT + Claude Vision + Claude Structurer), заносит данные в JobTread и <strong>мгновенно триггерит алерты для закупок и бухгалтерии</strong>.</p>
+
+<div class="callout danger">
+  <strong>Язык интерфейса: английский.</strong> PM — американцы (Richard Adams, Gregory Paris, Zachary Gange). Клиенты — американцы. Вся коммуникация с ботом на EN. Whisper распознаёт английский как основной язык.
+</div>
+
+<div class="callout warn">
+  <strong>Ключевое нововведение:</strong> каждый отчёт PM автоматически генерирует алерты для закупок (Алёна) и бухгалтерии (Анастасия/Иван) о необходимости выставить платежи. Это устраняет главную боль — задержки закупок, которые тормозят каждую стройку.
+</div>
+
+<p><strong>Проблема:</strong> PM заполняют daily logs раз в неделю на ~5%. Закупки обсуждаются устно на еженедельных встречах. Между завершением работ и оплатой подрядчику проходит дни, иногда недели.</p>
+
+<p><strong>Решение:</strong> PM говорит 60 секунд в Telegram → AI структурирует → JobTread обновляется → Алёна и Анастасия получают алерт с чётким списком платежей. Всё за 15 секунд.</p>
+
+<div class="metric-grid">
+  <div class="metric"><div class="label">Daily log полнота</div><div class="before">~5%</div><div class="after">90%+</div></div>
+  <div class="metric"><div class="label">Цикл закупки</div><div class="before">6–27 дней</div><div class="after">3–7 дней</div></div>
+  <div class="metric"><div class="label">Покрытие данных</div><div class="before">32%</div><div class="after">70%+</div><div class="unit">за 60 дней</div></div>
+  <div class="metric"><div class="label">Стоимость</div><div class="after">$0 / $200–450 / $450–965</div><div class="unit">зависит от adoption JT app</div></div>
+</div>
+
+<hr>
+
+<!-- ============== SECTION 2 ============== -->
+<h1 id="s3">3. Procurement & Payment Trigger</h1>
+<p>Ключевое нововведение: автоматическая цепочка <code>отчёт PM → алерт на закупку/оплату</code>. Сейчас это главное узкое горлышко на каждой стройке.</p>
+
+<h2>3.1 Текущая проблема (AS IS)</h2>
+<table>
+  <tr><th>Этап</th><th>Что происходит</th><th>Задержка</th><th>Последствия</th></tr>
+  <tr><td>PM завершает фазу</td><td>Говорит устно на встрече или в чате</td><td>1–7 дней</td><td>Подрядчик ждёт оплаты</td></tr>
+  <tr><td>Андрей/Артур узнают</td><td>На еженедельной встрече по закупкам</td><td>0–3 дня</td><td>Закупка не инициирована</td></tr>
+  <tr><td>Руби/Алёна заказывают</td><td>Идут к Анастасии за оплатой</td><td>1–3 дня</td><td>Материалы не заказаны</td></tr>
+  <tr><td>Анастасия платит</td><td>Вручную в Bank of America</td><td>1–2 дня</td><td>Доставка не начата</td></tr>
+  <tr><td>Материал приезжает</td><td>Доставка после оплаты</td><td>3–14 дней</td><td>Стройка стоит</td></tr>
+</table>
+<div class="callout danger"><strong>Итого: 6–27 дней</strong> от завершения работ до поступления материалов. При 12–16 месяцах стройки это суммарно добавляет 2–4 месяца к циклу.</div>
+
+<h2>3.2 Новый процесс (TO BE)</h2>
+<table>
+  <tr><th>Этап</th><th>Что происходит</th><th>Задержка</th><th>Результат</th></tr>
+  <tr><td>PM говорит в бот</td><td>"Rough plumbing done, electrical starts tomorrow with Lawson"</td><td>0 сек</td><td>Данные зафиксированы</td></tr>
+  <tr><td>AI структурирует</td><td>Статус задач + след. фаза + потребность в материалах</td><td>5–15 сек</td><td>JSON с procurement_triggers</td></tr>
+  <tr><td>Алерт Алёне</td><td>⚡ "734 Placido: Electrical starting tomorrow. Verify wire/conduit PO status."</td><td>&lt;1 мин</td><td>Закупка инициирована сразу</td></tr>
+  <tr><td>Алерт Анастасии</td><td>💰 "Xpress completed rough plumbing. Invoice expected: ~$7K."</td><td>&lt;1 мин</td><td>Оплата сегодня</td></tr>
+  <tr><td>Материалы на объекте</td><td>PO выставлен, оплачен, доставлен</td><td>3–7 дней</td><td>Без простоя</td></tr>
+</table>
+<div class="callout green"><strong>Экономия: 3–7 дней</strong> вместо 6–27. Сокращение цикла стройки на 1–2 месяца.</div>
+
+<h2>3.3 Типы procurement-триггеров</h2>
+<table>
+  <tr><th>Триггер</th><th>Когда срабатывает</th><th>Кому алерт</th><th>Содержание</th></tr>
+  <tr><td><code>TASK_COMPLETED</code></td><td>PM: работы подрядчика завершены</td><td>Анастасия + Иван</td><td>"💰 [Project]: [Contractor] completed [scope]. Expected invoice: ~$[amount]. Verify & process payment."</td></tr>
+  <tr><td><code>NEXT_PHASE_STARTING</code></td><td>PM: завтра/на след. неделе — новая фаза</td><td>Алёна</td><td>"⚡ [Project]: [Phase] starting [date]. Materials needed: [list]. Verify PO status."</td></tr>
+  <tr><td><code>MATERIAL_DELIVERED</code></td><td>PM: получили материалы</td><td>Анастасия</td><td>"✅ [Project]: [Material] received and accepted. Process vendor payment."</td></tr>
+  <tr><td><code>MATERIAL_BACKORDERED</code></td><td>PM: задержка доставки</td><td>Алёна + Андрей</td><td>"⚠️ [Project]: [Material] delayed to [date]. Find alternative or adjust schedule."</td></tr>
+  <tr><td><code>CHANGE_ORDER_DETECTED</code></td><td>PM: доп. работы/материалы вне плана</td><td>Артур + Алёна</td><td>"📝 [Project]: Change order: [desc]. Get quote. Client approval required."</td></tr>
+  <tr><td><code>INSPECTION_CORRECTIONS</code></td><td>PM: замечания инспекции</td><td>Алёна + PM</td><td>"🔧 [Project]: Corrections for [contractor]. Materials needed: [list]."</td></tr>
+</table>
+
+<h2>3.4 Пример полного цикла</h2>
+<h3>PM Richard (voice, 45 sec):</h3>
+<div class="callout">
+  <em>"Hey, rough plumbing is done on Placido. Xpress finished today, two guys, everything looks good. Tomorrow Lawson starts electrical, they confirmed 9 AM. Also, the lumber package from BMC came in, we accepted it."</em>
+</div>
+
+<h3>Автоматические алерты (&lt;1 минуты):</h3>
+<p><strong>Алерт #1 → Анастасия + Иван:</strong></p>
+<pre>"💰 734 Placido: Xpress Quality Services completed rough plumbing (2 crew).
+Expected invoice: ~$7,000. Budget line: 13.17.1 Plumbing Trade Work.
+Please verify scope and process payment."</pre>
+
+<p><strong>Алерт #2 → Алёна:</strong></p>
+<pre>"⚡ 734 Placido: Electrical phase starting tomorrow (Apr 11).
+Contractor: Lawson Electric LLC. Budget: $38,200 (actual bid).
+Verify: wire, conduit, panel materials PO status.
+Ensure deposit paid to Lawson per contract."</pre>
+
+<p><strong>Алерт #3 → Анастасия:</strong></p>
+<pre>"✅ 734 Placido: Lumber package delivery from BMC received and
+accepted by PM. Process payment per PO if not pre-paid."</pre>
+
+<h2>3.5 Как AI определяет суммы платежей</h2>
+<p>AI <strong>не выдумывает суммы</strong>. Он сопоставляет упомянутого подрядчика и scope с данными из JobTread:</p>
+<p>1. Запрашивает budget items по проекту (Estimator с 164 позициями)<br>
+2. Находит строку «Plumbing Trade Work» = $7,000 (actual bid из Sworn Statement)<br>
+3. Вставляет в алерт как «expected invoice», не как точную сумму<br>
+4. Анастасия сверяет с фактическим счётом подрядчика перед оплатой</p>
+
+<hr>
+
+<!-- ============== SECTION 3 ============== -->
+<h1 id="s4">4. Дизайн бота (английский интерфейс)</h1>
+
+<h2>4.1 Идентификация</h2>
+<table>
+  <tr><th>Параметр</th><th>Значение</th></tr>
+  <tr><td>Имя бота</td><td><code>@KHBuildBot</code> (или <code>@KelnerHomesBot</code>)</td></tr>
+  <tr><td>Язык</td><td>English (Whisper primary: EN)</td></tr>
+  <tr><td>Доступ</td><td>Приватный — whitelist Telegram ID</td></tr>
+  <tr><td>Пользователи</td><td>Richard Adams, Gregory Paris, Zachary Gange (PM), Andrey, Artur</td></tr>
+</table>
+
+<h2>4.2 Команды</h2>
+<table>
+  <tr><th>Команда</th><th>Описание</th><th>Ответ бота (EN)</th></tr>
+  <tr><td><code>/start</code></td><td>Онбординг + выбор проекта</td><td>"Welcome, Richard! Select your active project: 1) 734 Placido 2) Monte Cristo"</td></tr>
+  <tr><td><code>/project</code></td><td>Сменить проект</td><td>"Switched to Monte Cristo. All reports will be logged here."</td></tr>
+  <tr><td><code>/status</code></td><td>Текущий статус</td><td>"734 Placido: Rough MEP phase, 65% complete, 2 open issues, next inspection: Apr 15"</td></tr>
+  <tr><td><code>/today</code></td><td>Задачи на сегодня</td><td>"Today: Rough Electrical (Lawson, 9 AM). Window delivery expected (TMD)."</td></tr>
+  <tr><td><code>/issue</code></td><td>Отчёт о проблеме</td><td>"Got it. Describe the issue by voice or text, and attach a photo if possible."</td></tr>
+  <tr><td><code>/inspection</code></td><td>Результат инспекции</td><td>"Logging inspection. What type? (Rough Electrical / Rough Plumbing / Framing / ...)"</td></tr>
+  <tr><td><code>/undo</code></td><td>Удалить последнюю запись</td><td>"Last entry removed: 'Rough plumbing completed' from 10 min ago."</td></tr>
+  <tr><td><code>/help</code></td><td>Список команд</td><td>"Available commands: /project, /status, /today, /issue, /inspection, /undo"</td></tr>
+</table>
+
+<h2>4.3 Подтверждения бота</h2>
+<h3>После стандартного отчёта:</h3>
+<pre>✅ Daily log saved for 734 Placido:
+• Rough plumbing: COMPLETED (Xpress, 2 crew)
+• Rough electrical: starts tomorrow 9 AM (Lawson)
+• Lumber delivery from BMC: accepted
+→ View in JobTread: [link]
+📢 Procurement &amp; payment alerts sent to Alyona and Anastasia.</pre>
+
+<h3>После отчёта о проблеме:</h3>
+<pre>⚠️ ISSUE logged for 734 Placido:
+• Foundation crack on garage side (~2 ft), severity: HIGH
+• 2 photos attached
+• Assigned to: Artur (decision needed: structural engineer)
+→ Artur has been notified directly.</pre>
+
+<h3>После инспекции с замечаниями:</h3>
+<pre>🔍 Inspection logged for 734 Placido:
+• Rough Electrical: PASSED WITH CORRECTIONS
+• 1) Add GFCI outlet in 2nd floor bathroom
+• 2) Relocate junction box in utility room
+• Lawson to fix tomorrow
+📢 Procurement alert sent to Alyona: GFCI outlet + junction box materials needed.</pre>
+
+<hr>
+
+<!-- ============== SECTION 5 ============== -->
+<h1 id="s5">5. Архитектура конвейера</h1>
+
+<p>Высокоуровневая схема пайплайна: от ввода PM на площадке до записи в JobTread и обратной связи.</p>
+
+<div class="pipeline-diagram">
+  <div class="pd-label">PM on job site</div>
+
+  <div class="pd-row">
+    <div class="pd-box pd-input">
+      <div class="pd-title">Voice</div>
+      <div class="pd-sub">Telegram audio</div>
+    </div>
+    <div class="pd-box pd-input">
+      <div class="pd-title">Photos</div>
+      <div class="pd-sub">Site progress</div>
+    </div>
+    <div class="pd-box pd-input">
+      <div class="pd-title">Video</div>
+      <div class="pd-sub">Walkthrough clips</div>
+    </div>
+    <div class="pd-box pd-input">
+      <div class="pd-title">Text</div>
+      <div class="pd-sub">Quick notes</div>
+    </div>
+  </div>
+
+  <div class="pd-arrow"></div>
+
+  <div class="pd-box pd-bot">
+    <div class="pd-title">Telegram bot (@KHBuildBot)</div>
+    <div class="pd-sub">Webhook receives messages, routes by type, identifies PM and project</div>
+  </div>
+
+  <div class="pd-arrow pd-arrow-label" data-label="JSON payload"></div>
+
+  <div class="pd-box pd-ai">
+    <div class="pd-title">AI middleware (Claude API)</div>
+    <div class="pd-inner-row">
+      <div class="pd-box-inner">
+        <div class="pdi-title">Whisper STT</div>
+        <div class="pdi-sub">Voice to text</div>
+      </div>
+      <div class="pd-box-inner">
+        <div class="pdi-title">Vision analysis</div>
+        <div class="pdi-sub">Photo to context</div>
+      </div>
+      <div class="pd-box-inner">
+        <div class="pdi-title">Structurer</div>
+        <div class="pdi-sub">Text to entities</div>
+      </div>
+    </div>
+    <div class="pd-box-inner pd-box-wide">
+      <div class="pdi-title">Structured output</div>
+      <div class="pdi-sub">Daily log · task update · issue · photo tag · inspection note</div>
+    </div>
+  </div>
+
+  <div class="pd-arrow pd-arrow-label" data-label="Pave API calls"></div>
+
+  <div class="pd-box pd-jt">
+    <div class="pd-title">JobTread</div>
+    <div class="pd-chip-row">
+      <div class="pd-chip">Daily logs</div>
+      <div class="pd-chip">Task updates</div>
+      <div class="pd-chip">File uploads</div>
+      <div class="pd-chip">Issues/comments</div>
+    </div>
+  </div>
+
+  <div class="pd-arrow"></div>
+
+  <div class="pd-box pd-conf">
+    <div class="pd-title">Confirmation back to Telegram</div>
+    <div class="pd-sub">PM gets structured summary + link to JobTread entry</div>
+  </div>
+
+  <div class="pd-latency">Total latency: 5–15 seconds from voice message to JobTread entry</div>
+</div>
+
+<table>
+  <tr><th>Слой</th><th>Компонент</th><th>Технология</th><th>Задержка</th><th>Стоимость</th></tr>
+  <tr><td>1. Ввод</td><td>Telegram Bot API</td><td>Python (aiogram) + webhook</td><td>&lt;1 сек</td><td>Бесплатно</td></tr>
+  <tr><td>2. Транскрипция</td><td>OpenAI Whisper</td><td>whisper-1 (EN primary)</td><td>2–5 сек</td><td>$0.006/мин</td></tr>
+  <tr><td>3. Анализ фото</td><td>Claude Vision</td><td>Sonnet — конструкционный контекст</td><td>2–4 сек</td><td>~$0.01–0.03/фото</td></tr>
+  <tr><td>4. Структуризация</td><td>Claude API</td><td>Sonnet — текст → JSON entities</td><td>2–4 сек</td><td>~$0.01–0.02/сообщ.</td></tr>
+  <tr><td>5. Запись</td><td>JobTread Pave API</td><td>POST api.jobtread.com/pave</td><td>&lt;1 сек</td><td>Бесплатно</td></tr>
+  <tr><td>6. Алерты</td><td>Telegram Bot API</td><td>→ Алёна, Анастасия, Артур</td><td>&lt;1 сек</td><td>Бесплатно</td></tr>
+  <tr><td>7. Обратная связь</td><td>Telegram Bot API</td><td>→ PM (подтверждение)</td><td>&lt;1 сек</td><td>Бесплатно</td></tr>
+</table>
+
+<h2>5.1 Типы сообщений PM</h2>
+<table>
+  <tr><th>Тип ввода</th><th>Telegram event</th><th>Конвейер</th><th>Цель в JobTread</th></tr>
+  <tr><td>Voice</td><td><code>message.voice</code></td><td>.ogg → Whisper → Claude structurer</td><td>createComment + updateTask</td></tr>
+  <tr><td>Photo</td><td><code>message.photo</code></td><td>Download → Claude Vision → tag</td><td>createFile + createComment</td></tr>
+  <tr><td>Video</td><td><code>message.video</code></td><td>Keyframes → Claude Vision</td><td>createFile + createComment</td></tr>
+  <tr><td>Photo + caption</td><td><code>message.photo</code> + caption</td><td>Photo pipeline + caption context</td><td>createFile + createComment</td></tr>
+  <tr><td>Text</td><td><code>message.text</code></td><td>Direct → Claude structurer</td><td>createComment or updateTask</td></tr>
+  <tr><td>Voice + photo (group)</td><td>Multiple in sequence</td><td>Aggregate 60s window → single report</td><td>Consolidated daily log</td></tr>
+  <tr><td>Location</td><td><code>message.location</code></td><td>Auto-tag to nearest project</td><td>Job identification</td></tr>
+</table>
+
+<h2>5.2 Контекстная инъекция из JobTread</h2>
+<p>Перед каждым запуском структуризатора middleware запрашивает контекст:</p>
+<table>
+  <tr><th>Поле</th><th>Pave Query</th><th>Зачем</th></tr>
+  <tr><td>Текущие задачи</td><td><code>organization.jobs[id].tasks.nodes</code></td><td>Fuzzy-match упоминаний PM с задачами</td></tr>
+  <tr><td>Подрядчики</td><td><code>organization.jobs[id].aces.nodes</code></td><td>Fuzzy-match названий подрядчиков</td></tr>
+  <tr><td>Бюджетные позиции</td><td><code>organization.jobs[id].budgetItems.nodes</code></td><td>Суммы для procurement алертов</td></tr>
+  <tr><td>Последние отчёты</td><td><code>organization.jobs[id].comments (7 дней)</code></td><td>Избежать дубликатов</td></tr>
+  <tr><td>Открытые проблемы</td><td><code>organization.jobs[id].comments (flagged)</code></td><td>Отслеживание решения</td></tr>
+</table>
+
+<hr>
+
+<!-- ============== SECTION 5 ============== -->
+<h1 id="s6">6. Промпт структуризатора</h1>
+<p>JSON-схема с обязательной секцией <code>procurement_triggers</code>:</p>
+<pre>{
+  "daily_log": {
+    "work_performed": "string",
+    "crew_on_site": [{"name": "", "company": "", "count": 0}],
+    "weather": "string",
+    "deliveries": ["string"],
+    "issues": [{"description": "", "severity": "low|medium|high|critical",
+                "requires_decision_from": "string", "photo_ref": null}],
+    "notes_for_client": "string|null",
+    "safety_observations": "string|null"
+  },
+  "task_updates": [{
+    "task_name": "match to scheduled tasks",
+    "status": "not_started|in_progress|completed|blocked",
+    "actual_start": "date|null",
+    "actual_finish": "date|null",
+    "pct_complete": 0,
+    "notes": ""
+  }],
+  "inspection_notes": [{
+    "type": "string",
+    "result": "pass|fail|partial",
+    "corrections_required": "string|null"
+  }],
+  "material_tracking": [{
+    "material": "string",
+    "status": "ordered|delivered|installed|backordered",
+    "notes": ""
+  }],
+  "change_orders": [{
+    "description": "string",
+    "reason": "client_request|code_requirement|field_condition",
+    "estimated_impact": "string"
+  }],
+  "follow_ups": [{
+    "action": "string",
+    "assigned_to": "string",
+    "urgency": "low|medium|high"
+  }],
+  <strong>"procurement_triggers": [{
+    "type": "TASK_COMPLETED|NEXT_PHASE_STARTING|MATERIAL_DELIVERED|
+            MATERIAL_BACKORDERED|CHANGE_ORDER_DETECTED|INSPECTION_CORRECTIONS",
+    "project": "string",
+    "contractor": "string",
+    "scope": "string",
+    "budget_line": "string (from estimator)",
+    "expected_amount": 0,
+    "alert_to": ["Anastasia", "Ivan"],
+    "action_required": "string",
+    "urgency": "low|medium|high",
+    "next_phase_materials": [
+      {"item": "string", "vendor": "string", "po_status": "check"}
+    ]
+  }]</strong>
+}</pre>
+
+<div class="callout danger">
+  <strong>ОБЯЗАТЕЛЬНОЕ ПРАВИЛО:</strong> ALWAYS генерируй <code>procurement_triggers</code> если PM упомянул: (a) завершение работ, (b) начало новой фазы, (c) доставку материалов, (d) задержку, (e) change order, (f) замечания инспекции. Это не опционально.
+</div>
+
+<hr>
+
+<!-- ============== SECTION 6 ============== -->
+<h1 id="s7">7. Примеры из практики</h1>
+<p>На данных проекта 734 Placido / Rab Residence.</p>
+
+<h2>7.1 Стандартный дневной отчёт</h2>
+<p><strong>PM voice:</strong> <em>"Rough plumbing is done. Xpress, two guys. Weather's great. Lawson starts electrical tomorrow at 9. Lumber from BMC came in."</em></p>
+<p><strong>AI output:</strong> daily_log + 2 task_updates + 1 material_tracking + 2 procurement_triggers (TASK_COMPLETED → Anastasia, NEXT_PHASE_STARTING → Alyona)</p>
+
+<h2>7.2 Критическая проблема + фото</h2>
+<p><strong>PM voice + 2 photos:</strong> <em>"Found a crack in the foundation on the garage side, about two feet long. Need Artur to look at it, might need a structural engineer."</em></p>
+<p><strong>AI output:</strong> issue (severity: critical, assigned: Artur) + 2 photos tagged to Foundations + Telegram alert to Artur</p>
+
+<h2>7.3 Инспекция с замечаниями</h2>
+<p><strong>PM after /inspection:</strong> <em>"Rough electrical passed with corrections — need to add a GFCI outlet in the second floor bathroom and relocate a junction box in the utility room. Lawson said they'll fix it tomorrow."</em></p>
+<p><strong>AI output:</strong> inspection_notes (partial) + task_update (90%) + procurement_trigger INSPECTION_CORRECTIONS → Alyona (materials: GFCI outlet, junction box)</p>
+
+<h2>7.4 Задержка материалов</h2>
+<p><strong>PM text:</strong> <em>"TMD windows delivery pushed to next Thursday, some items backordered"</em></p>
+<p><strong>AI output:</strong> material_tracking (backordered) + task_update (Windows: blocked) + procurement_trigger MATERIAL_BACKORDERED → Alyona + Andrey</p>
+
+<h2>7.5 Change order</h2>
+<p><strong>PM voice:</strong> <em>"Client asked to add a gas line for an outdoor kitchen in the backyard. Not in the plan, need a change order."</em></p>
+<p><strong>AI output:</strong> change_order (client_request) + follow_ups (Gas Guru quote → Alyona, CO approval → Artur) + procurement_trigger CHANGE_ORDER_DETECTED</p>
+
+<hr>
+
+<!-- ============== SECTION 7 ============== -->
+<h1 id="s8">8. Обработка ошибок</h1>
+<table>
+  <tr><th>Сценарий</th><th>Обработка</th><th>Ответ PM (EN)</th></tr>
+  <tr><td>Whisper не распознал</td><td>Повтор. Если снова ошибка → просит переписать</td><td>"I couldn't understand the audio. Could you type it or re-record?"</td></tr>
+  <tr><td>Неясный проект</td><td>Спрашивает PM</td><td>"Which project? 1) 734 Placido 2) Monte Cristo"</td></tr>
+  <tr><td>Неизвестный подрядчик</td><td>Сохраняет с флагом confidence: low</td><td>"I logged 'Angel' as contractor — is this Angel Stucco LLC?"</td></tr>
+  <tr><td>Задача не найдена</td><td>Заметка без привязки, флаг на проверку</td><td>"Couldn't match 'drywall prep' to a scheduled task. Saved as note."</td></tr>
+  <tr><td>Множество сообщений за 60 сек</td><td>Агрегация в единый отчёт</td><td>Одно подтверждение на всё</td></tr>
+  <tr><td>Фото без контекста</td><td>Claude Vision анализирует, тегирует к фазе</td><td>"Photo saved to 734 Placido / Rough MEP. Anything to add?"</td></tr>
+  <tr><td>Не по теме</td><td>Игнорирует вежливо</td><td>"I'm set up for construction reports only. Use /help for commands."</td></tr>
+  <tr><td>Обрыв интернета</td><td>Очередь локально, повтор при восстановлении</td><td>"Your report is queued and will upload when connection restores."</td></tr>
+  <tr><td>Дубликат</td><td>Проверка за 24ч</td><td>"This looks similar to your report from 2 hours ago. Save anyway?"</td></tr>
+</table>
+
+<hr>
+
+<!-- ============== SECTION 8 ============== -->
+<h1 id="s9">9. Система алертов и эскалации</h1>
+<table>
+  <tr><th>Серьёзность</th><th>Действие</th><th>Уведомление</th><th>Пример</th></tr>
+  <tr><td>Низкая</td><td>Запись в JobTread</td><td>Нет</td><td>"Minor paint touch-up needed"</td></tr>
+  <tr><td>Средняя</td><td>Запись + тег ответственного</td><td>Telegram</td><td>"TMD delivery delayed 3 days"</td></tr>
+  <tr><td>Высокая</td><td>Запись + закреп + назначение</td><td>Telegram + email (Артур, Андрей)</td><td>"Foundation crack, engineer needed"</td></tr>
+  <tr><td>Критическая</td><td>Запись + немедленный алерт</td><td>Telegram + email + звонок GHL</td><td>"Safety: exposed wiring in occupied area"</td></tr>
+</table>
+
+<h2>9.1 Ежедневная сводка для Артура (18:00)</h2>
+<pre>📋 KH Build Daily Summary — April 10, 2026
+
+734 Placido (Richard): Rough plumbing done. Electrical starts tomorrow.
+⚠️ Foundation crack — needs your call.
+
+Monte Cristo (Gregory): Masonry 70%. On schedule. No issues.
+
+Pompano (Zachary): Interior framing 50%. Lumber received.
+1 medium issue: HVAC unit backordered.</pre>
+
+<hr>
+
+<!-- ============== SECTION 9 ============== -->
+<h1 id="s10">10. План внедрения</h1>
+<table>
+  <tr><th>Фаза</th><th>Срок</th><th>Объём</th><th>Критерий успеха</th></tr>
+  <tr><td><strong>Шаг 0: Наблюдение</strong></td><td>30–60 дней после JT migration</td><td>Замер daily log completion rate в JT PM-app по 3 PMs</td><td>Определён сценарий (full / partial / skip). Артур утверждает go/no-go.</td></tr>
+  <tr><td>Прототип</td><td>Нед. 1</td><td>Бот: voice → text → reply (EN). Тест TBD.</td><td>Whisper точно распознаёт EN строит. термины</td></tr>
+  <tr><td>Пилот</td><td>Нед. 2–3</td><td>Полный пайплайн + procurement алерты. Richard на 734 Placido.</td><td>5 отчётов с точностью &gt;85%. Алёна подтверждает полезность.</td></tr>
+  <tr><td>Все PM</td><td>Нед. 4–5</td><td>3 PM + procurement + payment алерты.</td><td>Все PM ежедневно. Анастасия обрабатывает платежи day-of.</td></tr>
+  <tr><td>Автоматизация</td><td>Нед. 6–8</td><td>Дедупликация, авто-PO, связка с QB.</td><td>Цикл закупок &lt; 48ч от завершения фазы.</td></tr>
+</table>
+
+<h2>10.1 Технические вехи</h2>
+<table>
+  <tr><th>Веха</th><th>Кто</th><th>Срок</th><th>Зависимости</th></tr>
+  <tr><td><strong>Observation period в JT PM app</strong></td><td>TBD</td><td>30–60 дней после Шага 3 migration plan</td><td>JobTread live, 3 PMs активны в JT</td></tr>
+  <tr><td>Создать бот через BotFather</td><td>TBD</td><td>День 1</td><td>—</td></tr>
+  <tr><td>VPS + Python + aiogram</td><td>TBD</td><td>Дни 1–2</td><td>VPS</td></tr>
+  <tr><td>Whisper интеграция</td><td>TBD</td><td>Дни 2–3</td><td>OpenAI API key</td></tr>
+  <tr><td>Claude structurer + тест</td><td>TBD</td><td>Дни 3–5</td><td>Anthropic API key</td></tr>
+  <tr><td>Claude Vision</td><td>TBD</td><td>Дни 5–7</td><td>Работающий structurer</td></tr>
+  <tr><td>JobTread Pave API</td><td>TBD</td><td>Дни 7–10</td><td>JT grant key</td></tr>
+  <tr><td>Procurement trigger engine</td><td>TBD</td><td>Дни 8–12</td><td>JT budget data</td></tr>
+  <tr><td>Онбординг Richard</td><td>TBD</td><td>День 12</td><td>Работающий пайплайн</td></tr>
+  <tr><td>Итерации</td><td>TBD + Richard</td><td>Дни 12–22</td><td>Реальные данные</td></tr>
+  <tr><td>Масштаб на всех PM</td><td>TBD</td><td>Дни 22–28</td><td>Стабильный пилот</td></tr>
+  <tr><td>Алерты + ежедневная сводка</td><td>TBD</td><td>Дни 28–35</td><td>Подтверждение Артура</td></tr>
+</table>
+
+<h2>10.2 Стоимость</h2>
+<div class="callout warn">
+  Стоимость ниже рассчитана для <strong>полного сценария</strong> (adoption JT PM-app &lt; 40%, см. раздел 1.3). При <strong>частичном сценарии</strong> (adoption 40–60%, только procurement triggers) — ~40–50% от указанной суммы. При <strong>нулевом сценарии</strong> (adoption &gt; 60%) бот не строится, стоимость $0.
+</div>
+<p>Расчёт пересмотрен для реалистичной нагрузки: <strong>3 PM × ~25 сообщений/день</strong> (голос 30–90 сек, фото-серии до 6 шт., видео-обходы 30–60 сек), 22 рабочих дня в месяц. Это <strong>~1,650 сообщений/мес</strong>, ~25 часов аудио, ~3,500 фото для анализа, ~150 видео-фрагментов. Плюс структуризация каждого, контекстная инъекция из JobTread на каждый запрос.</p>
+
+<table>
+  <tr><th>Позиция</th><th>В месяц</th><th>Комментарий</th></tr>
+  <tr><td>VPS / хостинг + storage</td><td>$30–60</td><td>Сервер с запасом по CPU/RAM, очередь задач, S3-совместимое хранилище для аудио/фото/видео</td></tr>
+  <tr><td>Whisper API (STT)</td><td>$60–120</td><td>~25 ч аудио/мес × $0.006/мин = $9 на низкой границе. С учётом ретраев, длинных голосовых, видео-аудио-дорожек — реально $60–120</td></tr>
+  <tr><td>Claude Sonnet — структуризация</td><td>$120–250</td><td>~1,650 сообщ./мес × контекстная инъекция (текущие задачи, подрядчики, бюджет) → большие input-токены. ~$0.08–0.15 на сообщение</td></tr>
+  <tr><td>Claude Vision — фото и видео</td><td>$200–450</td><td>~3,500 фото + ~600 keyframes из видео × ~$0.04–0.10 за изображение (Sonnet Vision). Основная статья расходов</td></tr>
+  <tr><td>Claude — алерты и сводки</td><td>$30–60</td><td>Ежедневная сводка для Артура, авто-сообщения Алёне/Анастасии, эскалации</td></tr>
+  <tr><td>Доп. мониторинг и логи</td><td>$10–25</td><td>Sentry / Logtail / Uptime monitoring</td></tr>
+  <tr><td>Telegram Bot API</td><td>Бесплатно</td><td>—</td></tr>
+  <tr><td>JobTread Pave API</td><td>Бесплатно</td><td>Включено в подписку JT</td></tr>
+  <tr><td><strong>ИТОГО</strong></td><td><strong>$450–965/мес</strong></td><td>Полный сценарий — adoption &lt; 40%; см. 1.3. Продакшн-нагрузка на 3 PM.</td></tr>
+  <tr><td colspan="3" style="font-size:0.78rem; color:var(--text-muted); font-style:italic;">При росте до 5 PM (масштабирование) — линейное увеличение пропорционально объёму сообщений: ориентир $750–1,600/мес. Сравнение с альтернативой: один день простоя стройки из-за задержки закупок ≈ $2–5K, окупается за 2–3 предотвращённых простоя в год.</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-top:40px;">
+  KH Build LLC &middot; Конфиденциально &middot; Апрель 2026
+</p>
+
+</div>
+<script>
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build LLC — Главная</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  --bg:#FFFFFF; --card:#FFFFFF; --surface2:#F5F3EE; --border:#E0DDD3;
+  --text:#1A1A1A; --muted:#6B6A65; --accent:#C9A65D; --accent-strong:#B38F47;
+  --dark-section:#1A1A1A; --on-dark:#F5F3EE;
+  --danger:#C0392B; --success:#1D9E75; --warning:#D4850F; --ai:#6C41D4;
+  --danger-bg:#FCEEEC; --success-bg:#E8F8F0; --warning-bg:#FEF3E0; --ai-bg:#F0ECFE;
+  --danger-text:#8B2818; --warning-text:#8B6914; --success-text:#0F6E56; --ai-text:#4A2B96;
+  --on-accent:#1A1A1A; --shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg:#141414; --card:#1F1F1F; --surface2:#292826; --border:#38342A;
+  --text:#F5F3EE; --muted:#9A938A; --accent:#C9A65D; --accent-strong:#D9B870;
+  --dark-section:#0B0B0B;
+  --danger:#ef4444; --success:#22c997; --warning:#f59e0b; --ai:#a78bfa;
+  --danger-bg:rgba(239,68,68,0.14); --success-bg:rgba(34,201,151,0.14);
+  --warning-bg:rgba(245,158,11,0.14); --ai-bg:rgba(167,139,250,0.14);
+  --danger-text:#fca5a5; --warning-text:#fcd34d; --success-text:#6ee7b7; --ai-text:#c4b5fd;
+  --on-accent:#141414; --shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Montserrat',-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; font-weight:400; }
+.container { max-width:1200px; margin:0 auto; padding:24px; }
+
+.theme-toggle { position:fixed; top:18px; right:18px; z-index:1000; width:42px; height:42px; border-radius:50%;
+  border:2px solid var(--accent); background:var(--dark-section); color:var(--accent);
+  font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25); transition:transform .2s,background .2s; font-family:inherit; }
+.theme-toggle:hover { transform:scale(1.1); background:var(--accent); color:var(--dark-section); }
+[data-theme="dark"] .theme-toggle__light { display:none; }
+[data-theme="light"] .theme-toggle__dark,:root:not([data-theme="dark"]) .theme-toggle__dark { display:none; }
+
+.header { text-align:center; padding:56px 24px 40px; margin:-24px -24px 40px;
+  background:var(--dark-section); color:var(--on-dark); border-bottom:3px solid var(--accent); }
+.header h1 { font-size:30px; font-weight:700; margin-bottom:10px; color:var(--on-dark); text-transform:uppercase; letter-spacing:1px; }
+.header .subtitle { color:#B8B5AA; font-size:14px; letter-spacing:0.5px; }
+.header .logo { font-size:24px; letter-spacing:6px; color:var(--accent); margin-bottom:18px; font-weight:800; }
+
+.section-title { font-size:20px; font-weight:700; margin:36px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:1px; }
+.section-desc { color:var(--muted); font-size:13px; margin-bottom:18px; }
+
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:16px 20px; text-align:center; box-shadow:var(--shadow); }
+.kpi .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; font-weight:600; }
+.kpi .value { font-size:26px; font-weight:700; }
+.kpi .note { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi.success .value { color:var(--success); }
+.kpi.warning .value { color:var(--warning); }
+.kpi.danger .value { color:var(--danger); }
+.kpi.accent .value { color:var(--accent); }
+
+.todo-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px; margin-bottom:24px; }
+.todo-card { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:4px; padding:16px 18px; box-shadow:var(--shadow); }
+.todo-card.sales { border-left-color:var(--success); }
+.todo-card.site { border-left-color:var(--warning); }
+.todo-card.migration { border-left-color:var(--accent); }
+.todo-card.marketing { border-left-color:var(--ai); }
+.todo-card.critical { border-left-color:var(--danger); }
+.todo-card.ai-cond { border-left-color:var(--ai); }
+.todo-card .cat { font-size:10px; text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:6px; }
+.todo-card.sales .cat { color:var(--success); }
+.todo-card.site .cat { color:var(--warning); }
+.todo-card.migration .cat { color:var(--accent); }
+.todo-card.marketing .cat { color:var(--ai); }
+.todo-card.critical .cat { color:var(--danger); }
+.todo-card.ai-cond .cat { color:var(--ai); }
+.todo-card h3 { font-size:14px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+.todo-card ul { list-style:none; font-size:12px; line-height:1.6; }
+.todo-card ul li { padding:4px 0; display:flex; gap:6px; align-items:flex-start; }
+.todo-card ul li::before { content:'•'; color:var(--accent); font-weight:700; flex-shrink:0; }
+.todo-card .meta { margin-top:10px; padding-top:8px; border-top:1px dashed var(--border); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+.todo-card .meta strong { color:var(--text); }
+
+.nav-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:24px; }
+.nav-card { display:block; text-decoration:none; background:var(--card); border:1px solid var(--border); border-radius:4px; padding:18px 20px; box-shadow:var(--shadow); color:var(--text); transition:border-color .2s, transform .2s; }
+.nav-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.nav-card .icon { font-size:22px; margin-bottom:6px; }
+.nav-card .title { font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+.nav-card .desc { font-size:12px; color:var(--muted); line-height:1.5; }
+
+.footer { text-align:center; padding:32px 24px; margin:48px -24px -24px; color:var(--on-dark); font-size:12px; letter-spacing:0.5px; background:var(--dark-section); border-top:3px solid var(--accent); }
+
+.reality-callout { background:var(--warning-bg); border:1px solid rgba(212,133,15,0.4); border-left:4px solid var(--warning); border-radius:4px; padding:14px 18px; margin-bottom:20px; box-shadow:var(--shadow); font-size:13px; line-height:1.6; }
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .container { padding:14px; }
+  .header { padding:32px 16px 24px; margin:-14px -14px 24px; }
+  .header h1 { font-size:20px; letter-spacing:0.5px; }
+  .header .subtitle { font-size:11px; line-height:1.5; }
+  .header .logo { font-size:18px; letter-spacing:4px; margin-bottom:12px; }
+  .section-title { font-size:16px; margin:28px 0 10px; }
+  .section-desc { font-size:12px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .kpi { padding:12px 14px; }
+  .kpi .value { font-size:22px; }
+  .kpi .label { font-size:10px; }
+  .kpi .note { font-size:10px; }
+  .todo-grid { grid-template-columns:1fr; gap:10px; }
+  .todo-card { padding:14px; }
+  .todo-card h3 { font-size:13px; }
+  .todo-card ul { font-size:11px; }
+  .nav-grid { grid-template-columns:1fr; }
+  .nav-card { padding:14px 16px; }
+  .reality-callout { padding:12px 14px; font-size:12px; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+  .footer { padding:20px 16px; margin:32px -14px -14px; font-size:10px; line-height:1.6; }
+}
+@media (max-width: 420px) {
+  .kpi-grid { grid-template-columns:1fr; }
+  .header h1 { font-size:18px; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+
+<div class="container">
+
+<div class="header">
+  <div class="logo">KH BUILD</div>
+  <h1>KH Build LLC · Главная</h1>
+  <div class="subtitle">Tampa Bay, Florida · Обновлено 20 апреля 2026 · Конфиденциально</div>
+</div>
+
+<!-- Financial summary -->
+<div class="section-title">Финансовый срез</div>
+<div class="section-desc">Короткая сводка. Детально: воронка новых сделок — <a href="sales_dashboard.html" style="color:var(--accent);">Дэшборд продаж</a>, производство / cashflow — <a href="portfolio_dashboard.html" style="color:var(--accent);">Дэшборд портфеля</a>.</div>
+
+<div class="kpi-grid">
+  <div class="kpi warning">
+    <div class="label">Банк. остаток (APR 26)</div>
+    <div class="value">$68.8K</div>
+    <div class="note">1.1 мес фикс. burn · источник: портфель</div>
+  </div>
+  <div class="kpi accent">
+    <div class="label">В портфеле</div>
+    <div class="value">14</div>
+    <div class="note">проектов, $1.99M fee (включая 3 недавно подписанных)</div>
+  </div>
+  <div class="kpi accent">
+    <div class="label">Активная воронка</div>
+    <div class="value">9</div>
+    <div class="note">pending, $1.58M потенциал</div>
+  </div>
+  <div class="kpi success">
+    <div class="label">Цель 2026 от воронки</div>
+    <div class="value">$500–800K</div>
+    <div class="note">fee при конверсии 30–40% из pending</div>
+  </div>
+  <div class="kpi danger">
+    <div class="label">Фикс. burn/мес</div>
+    <div class="value">$61.2K</div>
+    <div class="note">зп 83.8% от фикс. расходов</div>
+  </div>
+</div>
+
+<div class="reality-callout">
+  <strong>Две разные картинки:</strong> <a href="sales_dashboard.html" style="color:var(--warning-text); font-weight:700;">Дэшборд продаж</a> — 9 pending сделок на $1.58M fee, без подписанных контрактов (все 3 signed уехали в портфель). <a href="portfolio_dashboard.html" style="color:var(--warning-text); font-weight:700;">Дэшборд портфеля</a> — 14 проектов в производстве, $1.99M fee, помесячный cashflow и банковский остаток. Отдельно <a href="abc_projects.html" style="color:var(--warning-text); font-weight:700;">ABC Projects 🔒</a> — закрытый раздел, инвойсы подрядчиков и банковские линии по 10 объектам.
+</div>
+
+<!-- To-Do board -->
+<div class="section-title">Что сейчас в работе</div>
+<div class="section-desc">Текущие задачи по стримам. Зелёный — продажи, жёлтый — сайт, золотой — миграция JobTread, фиолетовый — маркетинг / AI, красный — критический блок.</div>
+
+<div class="todo-grid">
+
+  <div class="todo-card sales">
+    <div class="cat">Продажи · follow-up</div>
+    <h3>Горячие сделки — критические даты</h3>
+    <ul>
+      <li><strong>Jason #1:</strong> ожидается оплата permit fees (первоначальный deadline 31 мар прошёл, сделка на паузе) — нужно подтвердить статус финансирования у клиента</li>
+      <li><strong>Laura Travison:</strong> ждём ответ по Architectural Contract</li>
+      <li><strong>Karen &amp; Dave:</strong> walkthru домов — прошёл 13 апр</li>
+      <li><strong>Alex Bacon:</strong> встреча в офисе — прошла 15 апр</li>
+      <li><strong>Susan Armon:</strong> встреча на 1935 Shore Acres — прошла 15 апр</li>
+    </ul>
+    <div class="meta"><span><strong>Владелец:</strong> Артур (sales closer)</span><span><a href="sales_dashboard.html" style="color:var(--accent); font-weight:600;">Дэшборд продаж →</a></span></div>
+  </div>
+
+  <div class="todo-card site">
+    <div class="cat">Сайт khbuild.pro · контент</div>
+    <h3>Сайт сдан ✓ · наполнение контентом</h3>
+    <ul>
+      <li>khbuild.pro — <strong>✓ сдан</strong> (Аркадий)</li>
+      <li><strong>SEO-статьи</strong> для блога — ждём от Артура (экспертный контент)</li>
+      <li><strong>Видео для YouTube:</strong> интервью с клиентами + обзоры домов (Аркадий)</li>
+      <li>Нарезка клипов Shorts/Reels из существующих материалов (Аркадий)</li>
+      <li>Создание новых соцсетей под бренд KH Build — ждём от Артура</li>
+    </ul>
+    <div class="meta"><span><strong>Контент:</strong> Артур (SEO) · Аркадий (видео)</span><span><a href="marketing.html" style="color:var(--accent); font-weight:600;">Маркетинг →</a></span></div>
+  </div>
+
+  <div class="todo-card migration">
+    <div class="cat">Миграция BT → JobTread</div>
+    <h3>4 фазы миграции (14 апр → июнь)</h3>
+    <ul>
+      <li><strong>Шаг 0:</strong> покупка подписки JT — Артур, ожидаем</li>
+      <li><strong>Шаг 1:</strong> RACI и задания по 10 блокам — к 20 апр (Артур утверждает)</li>
+      <li><strong>Шаг 2:</strong> процессы как шаблоны в JT — к 27 апр (вся команда)</li>
+      <li><strong>Шаг 3:</strong> перенос 7 активных + 2 новых проекта — с 27 апр (Андрей ведущий)</li>
+      <li>JobTread пока <strong>не интегрирован</strong> — основная система учёта остаётся BuilderTrend</li>
+    </ul>
+    <div class="meta"><span><strong>Владелец:</strong> Артур / Андрей / Анастасия</span><span><a href="jobtread_migration.html" style="color:var(--accent); font-weight:600;">План →</a></span></div>
+  </div>
+
+  <div class="todo-card marketing">
+    <div class="cat">Маркетинг · бренд KH Build</div>
+    <h3>Соцсети и трафик</h3>
+    <ul>
+      <li>Создать <strong>новые</strong> аккаунты (FB / IG / YouTube / TikTok / GBP) под бренд KH Build</li>
+      <li>Назначить ответственного за ведение соцсетей — TBD (открытый вопрос к Артуру)</li>
+      <li>Решение по бюджету FB Ads: $50 vs $100/день (сейчас $50, running — Денис)</li>
+      <li>Расширенная GHL-автоматизация — ТЗ (Дмитрий М.) после сдачи сайта</li>
+    </ul>
+    <div class="meta"><span><strong>Владелец:</strong> Артур · Денис (ads)</span><span><a href="marketing.html" style="color:var(--accent); font-weight:600;">Маркетинг →</a></span></div>
+  </div>
+
+  <div class="todo-card critical">
+    <div class="cat">Пререквизит до AI</div>
+    <h3>Процессы и роли (Шаги 1–2)</h3>
+    <ul>
+      <li><strong>Шаг 1:</strong> Формализация ролей и закрепление data points (сейчас 68% не вводятся)</li>
+      <li><strong>Шаг 2:</strong> Стандартизация workflow 9 фаз (5/6 проектов — кастом, ломает шаблоны)</li>
+      <li>Без этого AI будет автоматизировать хаос</li>
+      <li>Делается <strong>параллельно</strong> с миграцией на JT</li>
+    </ul>
+    <div class="meta"><span><strong>Владелец:</strong> Артур</span><span><a href="project_details.html" style="color:var(--accent); font-weight:600;">Детали проекта →</a></span></div>
+  </div>
+
+  <div class="todo-card ai-cond">
+    <div class="cat">AI · условный запуск</div>
+    <h3>Telegram Bot — решение после миграции</h3>
+    <ul>
+      <li>После JT live: <strong>30–60 дней наблюдения</strong> за adoption нативного JT PM-app</li>
+      <li>&gt;60% adoption → бот не строим ($0)</li>
+      <li>40–60% → частичный бот (procurement triggers) ~$200–450/мес</li>
+      <li>&lt;40% → полный voice-first бот $450–965/мес</li>
+    </ul>
+    <div class="meta"><span><strong>Владелец:</strong> TBD (dev) · Артур (go/no-go)</span><span><a href="KH_Build_Telegram_Bot_Spec_v2.html" style="color:var(--accent); font-weight:600;">Спека →</a></span></div>
+  </div>
+
+</div>
+
+<!-- Navigation to detail pages -->
+<div class="section-title">Детальные разделы</div>
+<div class="section-desc">Подробная аналитика, планы и спецификации по каждому направлению.</div>
+
+<div class="nav-grid">
+  <a class="nav-card" href="project_details.html">
+    <div class="icon">📋</div>
+    <div class="title">Детальное описание проекта</div>
+    <div class="desc">Не масштабируемые роли · полный граф процесса · покрытие данных · AI-модули · конкуренты</div>
+  </a>
+  <a class="nav-card" href="sales_dashboard.html">
+    <div class="icon">📊</div>
+    <div class="title">Дэшборд продаж</div>
+    <div class="desc">12 сделок с разбивкой по надёжности · тайминг поступлений · реалистичный прогноз 2026</div>
+  </a>
+  <a class="nav-card" href="marketing.html">
+    <div class="icon">📣</div>
+    <div class="title">Маркетинг</div>
+    <div class="desc">Статус-апдейт · To-Do по ответственным · Marketing Plan · Referral Letters · долгосрочный план масштабирования</div>
+  </a>
+  <a class="nav-card" href="jobtread_migration.html">
+    <div class="icon">🔄</div>
+    <div class="title">JobTread Migration Plan</div>
+    <div class="desc">4 фазы миграции · RACI-матрица · scope freeze · риски · ритм работы. Горизонт 1,5–2 мес.</div>
+  </a>
+  <a class="nav-card" href="kh_build_process_flowchart.html">
+    <div class="icon">🗺</div>
+    <div class="title">Граф производственного процесса</div>
+    <div class="desc">AS IS на 9 фаз · 5 milestone · параллельные потоки · текущая система учёта BT</div>
+  </a>
+  <a class="nav-card" href="KH_Build_Telegram_Bot_Spec_v2.html">
+    <div class="icon">🤖</div>
+    <div class="title">Telegram Bot Spec</div>
+    <div class="desc">Условная спека · решение go/no-go после adoption JT PM-app · $0 / $200–450 / $450–965</div>
+  </a>
+  <a class="nav-card" href="portfolio_dashboard.html">
+    <div class="icon">💼</div>
+    <div class="title">Дэшборд портфеля</div>
+    <div class="desc">14 проектов · помесячный cashflow · runway · болевые точки · crisis playbook 30/60/90</div>
+  </a>
+</div>
+
+<!-- ABC Projects — separate block (gated content) -->
+<div class="section-title" style="border-bottom-color:var(--danger); color:var(--danger-text);">🔒 ABC Projects · отдельный контур</div>
+<div class="section-desc">Независимый от основного GC-портфеля поток: инвойсы подрядчиков, корпоративные кредитные линии и объекты на продажу по 10 адресам. <strong>Закрытый раздел</strong> — детали доступны по паролю.</div>
+
+<a href="abc_projects.html" style="display:block; text-decoration:none; background:var(--card); border:1px solid var(--danger); border-left:5px solid var(--danger); border-radius:4px; padding:22px 26px; margin-bottom:32px; box-shadow:var(--shadow); color:var(--text); transition:transform .2s, box-shadow .2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.transform=''; this.style.boxShadow='var(--shadow)'">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;">
+    <div style="flex:1 1 300px;">
+      <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--danger-text); font-weight:700; margin-bottom:6px;">🔒 ABC Projects · доступ по паролю</div>
+      <div style="font-size:17px; font-weight:700; margin-bottom:10px;">10 объектов · инвойсы подрядчиков, кредитные линии, продажи</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.6;">
+        Open-limit мониторинг, разрыв покрытия, sold-cash распределение, action plan 14/30/60. Содержит чувствительные финансовые данные.
+      </div>
+    </div>
+    <div style="font-size:38px; color:var(--danger); font-weight:800;">→</div>
+  </div>
+</a>
+
+<div class="footer">
+  <div style="margin-bottom:16px;">
+    <a href="print_all.html" target="_blank" style="display:inline-block; padding:10px 22px; background:var(--accent); color:var(--dark-section); border-radius:4px; text-decoration:none; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; transition:opacity .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">📄 Export all pages as PDF</a>
+  </div>
+  KH Build LLC · Главная · Обновлено 20 апреля 2026 · Подготовлено: Дмитрий (Strategy &amp; IT Consultant) · Конфиденциально
+</div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — Граф процесса</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root{
+  /* Light theme — KH Build (default) */
+  --bg:#FFFFFF;--wh:#FFFFFF;--brd:#E0DDD3;--brdl:#EEEBE2;
+  --tx:#1A1A1A;--tx2:#6B6A65;--tx3:#9A938A;
+  --accent:#C9A65D;
+  --dark-section:#1A1A1A;--on-dark:#F5F3EE;
+  --blue:#2563eb;--purple:#7c3aed;--teal:#0d9488;--amber:#C9A65D;
+  --rose:#e11d48;--orange:#ea580c;--sky:#0284c7;--emerald:#059669;--slate:#475569;
+  --circle-text:#fff;
+  --par-bg:rgba(201,166,93,0.08);
+  --pay-bg:#e0f2fe;
+  --fin-bg:#f1f5f9;
+  --node-tag-bg:rgba(0,0,0,0.05);
+  --shadow-color:rgba(0,0,0,0.1);
+  --font:'Montserrat',-apple-system,sans-serif;
+  --mono:'Montserrat',monospace;
+}
+[data-theme="dark"]{
+  --bg:#141414;--wh:#1F1F1F;--brd:#38342A;--brdl:#292826;
+  --tx:#F5F3EE;--tx2:#9A938A;--tx3:#6B6860;
+  --accent:#C9A65D;
+  --dark-section:#0B0B0B;--on-dark:#F5F3EE;
+  --blue:#4f8ff7;--purple:#a78bfa;--teal:#22c997;--amber:#C9A65D;
+  --rose:#f472b6;--orange:#fb923c;--sky:#38bdf8;--emerald:#34d399;--slate:#94a3b8;
+  --circle-text:#141414;
+  --par-bg:rgba(201,166,93,0.1);
+  --pay-bg:rgba(56,189,248,0.14);
+  --fin-bg:rgba(148,163,184,0.14);
+  --node-tag-bg:rgba(255,255,255,0.06);
+  --shadow-color:rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);font-weight:400;}
+
+/* Theme toggle */
+.theme-toggle {
+  position:fixed;top:14px;right:18px;z-index:200;
+  width:38px;height:38px;border-radius:50%;
+  border:2px solid var(--accent);background:var(--dark-section);color:var(--accent);
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);transition:transform .2s,background .2s;
+  font-family:inherit;
+}
+.theme-toggle:hover{transform:scale(1.1);background:var(--accent);color:var(--dark-section);}
+[data-theme="dark"] .theme-toggle__light{display:none;}
+[data-theme="light"] .theme-toggle__dark,:root:not([data-theme="dark"]) .theme-toggle__dark{display:none;}
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:4px;}
+
+.hdr{
+  background:var(--dark-section);color:var(--on-dark);
+  border-bottom:3px solid var(--accent);padding:16px 28px;
+  position:sticky;top:0;z-index:100;
+}
+.hdr h1{font-size:17px;font-weight:700;color:var(--on-dark);text-transform:uppercase;letter-spacing:0.8px;}
+.hdr .sub{font-size:11px;color:#B8B5AA;margin-top:2px;letter-spacing:0.3px;}
+
+.wrap{overflow:auto;padding:24px;}
+
+/* PHASE ROW */
+.phase{
+  display:flex;align-items:flex-start;margin-bottom:8px;
+  position:relative;
+}
+.phase-label{
+  width:160px;min-width:160px;padding:8px 12px 8px 0;
+  text-align:right;position:sticky;left:0;z-index:10;
+  background:var(--bg);
+}
+.phase-label .pn{font-size:12px;font-weight:700;line-height:1.3;}
+.phase-label .pd{font-size:9px;color:var(--tx3);margin-top:1px;}
+.phase-label .pw{font-size:9px;color:var(--tx2);}
+
+.phase-content{
+  display:flex;flex-direction:column;gap:4px;
+  padding:8px 0 8px 16px;border-left:2px solid var(--brd);
+  flex:1;min-width:0;
+}
+.swim-row{display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap;}
+
+/* NODE */
+.node{
+  display:flex;flex-direction:column;align-items:center;
+  width:130px;min-width:130px;padding:4px 6px;
+  position:relative;
+}
+.circle{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--circle-text);
+  box-shadow:0 2px 8px var(--shadow-color);
+  flex-shrink:0;position:relative;z-index:2;
+  transition:transform 0.15s;
+}
+.node:hover .circle{transform:scale(1.15);}
+.node-text{text-align:center;margin-top:5px;max-width:124px;}
+.node-text .nn{font-size:10px;font-weight:600;line-height:1.25;color:var(--tx);}
+.node-text .nw{font-size:8px;color:var(--tx3);margin-top:1px;}
+.node-text .nd{font-size:8px;color:var(--tx2);line-height:1.3;margin-top:2px;}
+.node-text .nt{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:2px;}
+.node-text .nt span{font-size:7px;background:var(--node-tag-bg);color:var(--tx2);padding:0 3px;border-radius:2px;}
+
+/* ARROW between nodes */
+.arrow-h{
+  display:flex;align-items:center;justify-content:center;
+  min-width:24px;padding-top:14px;color:var(--brd);font-size:18px;
+  align-self:flex-start;
+}
+
+/* PARALLEL BRACKET */
+.parallel-block{
+  display:flex;flex-direction:column;gap:2px;
+  border:1px dashed var(--amber);border-radius:8px;
+  padding:4px 2px;background:var(--par-bg);
+  position:relative;
+}
+.par-label{
+  position:absolute;top:-8px;left:8px;font-size:7px;font-weight:600;
+  color:var(--amber);background:var(--bg);padding:0 4px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+.par-row{display:flex;align-items:flex-start;gap:0;}
+
+/* PHASE DIVIDER */
+.phase-div{
+  display:flex;align-items:center;padding-left:160px;margin:4px 0;
+}
+.phase-div-line{flex:1;height:1px;background:var(--brdl);}
+.phase-div-dot{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--wh);border:1.5px solid var(--brd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--tx3);margin:0 4px 0 12px;
+}
+
+/* MILESTONE */
+.milestone .circle{
+  border-radius:3px;transform:rotate(45deg);
+  width:28px;height:28px;font-size:9px;
+  background:var(--accent) !important;color:var(--dark-section) !important;
+}
+.milestone .circle span{transform:rotate(-45deg);}
+.milestone:hover .circle{transform:rotate(45deg) scale(1.15);}
+
+/* CONTINUOUS FLOW INDICATOR */
+.flow-tag{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:8px;font-weight:600;padding:2px 6px;
+  border-radius:10px;margin-top:3px;
+}
+.flow-tag.pay{background:var(--pay-bg);color:var(--sky);}
+.flow-tag.fin{background:var(--fin-bg);color:var(--slate);}
+
+.legend{
+  display:flex;flex-wrap:wrap;gap:14px;padding:12px 28px;
+  background:var(--dark-section);color:#B8B5AA;
+  border-top:3px solid var(--accent);
+  position:sticky;bottom:0;font-size:9px;z-index:100;
+}
+.li{display:flex;align-items:center;gap:4px;}
+.ld{width:12px;height:12px;border-radius:50%;}
+.ldm{width:7px;height:7px;background:var(--on-dark);transform:rotate(45deg);border-radius:1px;}
+
+@media(max-width:900px){.wrap{padding:12px;}.phase-label{width:100px;min-width:100px;}.node{width:100px;min-width:100px;}}
+@media(max-width:768px){
+  .hdr{padding:12px 14px;}
+  .hdr h1{font-size:14px;}
+  .hdr .sub{font-size:10px;}
+  .hdr > div[style*="margin-bottom"] a{padding:6px 12px !important; font-size:10px !important;}
+  .theme-toggle{top:8px; right:10px; width:32px; height:32px; font-size:13px;}
+  .legend{padding:8px 14px; gap:10px; font-size:8px;}
+  .legend .li{gap:3px;}
+  .legend .ld{width:10px; height:10px;}
+  .phase-label{width:80px; min-width:80px; padding:6px 8px 6px 0;}
+  .phase-label .pn{font-size:10px;}
+  .phase-label .pd, .phase-label .pw{font-size:8px;}
+  .node{width:90px; min-width:90px;}
+  .circle{width:32px; height:32px; font-size:10px;}
+  .node-text .nn{font-size:9px;}
+  .node-text .nw, .node-text .nd{font-size:7px;}
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+
+<div class="hdr">
+  <div style="margin-bottom:12px;">
+    <a href="index.html" style="display:inline-block; padding:8px 20px; background:var(--accent); color:var(--dark-section); border-radius:4px; text-decoration:none; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; transition:opacity .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">← Назад к карте процессов</a>
+  </div>
+  <h1>KH Build — Граф производственного процесса (AS IS)</h1>
+  <div class="sub">Кружки = шаги · Стрелки = последовательность · Рамки ╌ = параллельные процессы · Строительство 12–16 мес. · Тег <strong>BT</strong> = BuilderTrend (текущая система). JobTread в миграции, ещё не интегрирован.</div>
+</div>
+
+<div class="wrap" id="wrap"></div>
+
+<div class="legend">
+  <div class="li"><div class="ld" style="background:var(--blue)"></div>Лиды</div>
+  <div class="li"><div class="ld" style="background:var(--purple)"></div>Pre-sale</div>
+  <div class="li"><div class="ld" style="background:var(--teal)"></div>Контракт</div>
+  <div class="li"><div class="ld" style="background:var(--amber)"></div>Дизайн</div>
+  <div class="li"><div class="ld" style="background:var(--rose)"></div>Permitting</div>
+  <div class="li"><div class="ld" style="background:var(--sky)"></div>Оплаты / Банк</div>
+  <div class="li"><div class="ld" style="background:var(--orange)"></div>Строительство</div>
+  <div class="li"><div class="ld" style="background:var(--slate)"></div>Фин. контроль</div>
+  <div class="li"><div class="ld" style="background:var(--emerald)"></div>Сдача</div>
+  <div class="li"><div class="ldm"></div>Milestone</div>
+  <div class="li">→ Последовательность</div>
+  <div class="li" style="color:var(--amber)">╌ Параллельно</div>
+</div>
+
+<script>
+const colors={blue:'var(--blue)',purple:'var(--purple)',teal:'var(--teal)',amber:'var(--amber)',rose:'var(--rose)',orange:'var(--orange)',sky:'var(--sky)',emerald:'var(--emerald)',slate:'var(--slate)'};
+
+// Data: phases with rows (each row = one horizontal swim lane, items connected by arrows)
+// parallel groups are wrapped in {par: true, label:'...', rows:[ [items], [items] ]}
+const phases = [
+{name:'1. Лидогенерация',dur:'1–3 дня',who:'Шейлин, GHL',c:'blue', rows:[
+  [
+    {n:'Входящий лид',w:'GHL',d:'Google / Facebook / реферал → авто-ответ GHL',t:['GHL']},
+    {n:'Квалификация',w:'Шейлин',d:'Участок, бюджет, сроки, стиль → приоритет',t:['iMessage','WhatsApp']},
+    {n:'Follow-up',w:'Шейлин',d:'Повторные контакты через 3–7 дн.',t:['iMessage']},
+    {n:'Передача Артуру',w:'Шейлин',d:'Квал. лид → назначение встречи',t:[],ms:true},
+  ]
+]},
+{name:'2. Pre-sale',dur:'1–2 нед.',who:'Артур',c:'purple', rows:[
+  [
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Lot Fit Study',w:'Артур',d:'Зонинг, setbacks, FEMA, ISR, max высота. Gemini ~20 мин',t:['Gemini','pcpao.gov']}],
+      [{n:'Предв. смета',w:'Артур',d:'$230/sqft living + $130 non-living + GC 20%',t:['Excel']}],
+    ]},
+    {n:'Встреча с клиентом',w:'Артур',d:'Портфолио 30 домов, 15 моделей, крючок: дизайн $5K vs $30K',t:['Google Drive']},
+    {n:'Выбор пути',w:'Клиент',d:'Model ($11K) / Custom ($3/sqft) / Свой проект',t:[]},
+  ]
+]},
+{name:'3. Контракт',dur:'3–7 дней',who:'Иван, Артур, Анастасия',c:'teal', rows:[
+  [
+    {n:'Подготовка контракта',w:'Иван',d:'Scope, бюджет, сроки, allowances, exclusions',t:[]},
+    {n:'Согласование',w:'Артур + клиент',d:'Условия, payment schedule',t:[]},
+    {n:'Подписание ✓',w:'Артур',d:'Фиксация в production schedule',t:[],ms:true},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Депозит $10K',w:'Анастасия',d:'BoA. Кредитка = 3% потери!',t:['BoA']}],
+      [{n:'Настройка QB',w:'Анастасия',d:'Проект в QuickBooks + Draw Schedule',t:['QB']}],
+    ]},
+  ]
+]},
+{name:'4. Дизайн',dur:'1–4 мес.',who:'Артур, Алёна, архитектор',c:'amber', rows:[
+  [
+    {n:'Kick-off',w:'Артур + клиент',d:'Стиль, требования, ТЗ архитектору',t:[]},
+    {n:'Schematic Design',w:'Архитектор',d:'Концепт: планировки, фасады',t:['Google Drive']},
+    {n:'Согласование SD',w:'Артур + клиент',d:'Итерации по планировке',t:[]},
+    {n:'Construction Drawings',w:'Архитектор',d:'Детальные чертежи, размеры',t:['Google Drive']},
+  ],
+  [
+    {skip:2},
+    {par:true,label:'Параллельно с CD',rows:[
+      [{n:'Инженерия MEP',w:'Инженер',d:'Structural, HVAC, plumbing, electrical, energy code',t:[]}],
+      [{n:'Интерьерный дизайн',w:'Шейлин',d:'$5K vs $30K рынок (опция)',t:[]}],
+    ]},
+  ],
+  [
+    {skip:4},
+    {n:'Бюджет (Estimator)',w:'Алёна',d:'80+ позиций Excel, GC fee 20%',t:['Excel']},
+    {n:'Proposal Package',w:'Артур',d:'Scope, exclusions, timeline, allowances',t:['Excel']},
+  ]
+]},
+{name:'5. Permitting',dur:'~3 мес.',who:'Андрей',c:'rose', rows:[
+  [
+    {n:'Сбор пакета',w:'Андрей',d:'Планы, инженерия, survey, energy calc, site plan',t:['Google Drive']},
+    {n:'Подача',w:'Андрей',d:'В юрисдикцию: St. Pete / Tampa',t:[]},
+    {n:'Ревизии и правки',w:'Андрей + архитектор',d:'Несколько раундов замечаний',t:[]},
+    {n:'Building Permit ✓',w:'Андрей',d:'Stamped документы, Placard',t:['Google Drive'],ms:true},
+  ],
+  [
+    {skip:3},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Pre-Construction',w:'Андрей',d:'Utility, subs, schedule, площадка',t:[]}],
+      [{n:'Настройка BuilderTrend',w:'PM / Андрей',d:'Template, to-do, подрядчики. JobTread в миграции — пока не интегрирован.',t:['BT']}],
+      [{n:'Оплата permit fees',w:'Анастасия',d:'Building, Elec, Plumb, HVAC',t:[]}],
+    ]},
+  ]
+]},
+{name:'6. Оплаты клиента',dur:'С контракта до сдачи',who:'Анастасия, Банк',c:'sky', rows:[
+  [
+    {n:'Construction Loan',w:'Клиент + BoA',d:'Оформление кредита: контракт, планы, permit, смета',t:['BoA']},
+    {n:'Draw Schedule',w:'Анастасия',d:'12 draws, ~$1.2M total. График по этапам',t:['Excel']},
+    {n:'1-й Disbursement ✓',w:'Банк',d:'Деньги → стройка начинается',t:[],ms:true},
+  ],
+  [
+    {skip:1},
+    {n:'Ежемесячный цикл (×12)',w:'Анастасия',d:'Sworn Statement → Draw Request → Банк проверяет → Disbursement',t:['Excel','QB','BoA'],flow:'pay'},
+    {n:'→ Оплата вендоров',w:'Анастасия',d:'Из полученных от банка средств → оплата подрядчиков на каждом этапе',t:['BoA','QB'],flow:'pay'},
+  ]
+]},
+{name:'7. Строительство',dur:'12–16 мес.',who:'PM, подрядчики',c:'orange', rows:[
+  [
+    {n:'Staking',w:'PM',d:'Разбивка участка, Day 0',t:['BT']},
+    {n:'Masonry & Trusses',w:'PM + subs',d:'Фундамент, каркас, стропила. ~90 дн.',t:['BT']},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Roof Dry In',w:'PM',d:'Гидроизоляция крыши',t:['BT']}],
+      [{n:'Int. Framing',w:'PM',d:'Перегородки',t:['BT']}],
+    ]},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Rough MEP',w:'MEP subs',d:'Черновые сети ~30 дн.',t:['BT']}],
+      [{n:'Windows',w:'PM + subs',d:'PGT glass, двери',t:['BT']}],
+    ]},
+  ],
+  [
+    {skip:1},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Stucco',w:'PM',d:'Штукатурка ~28 дн.',t:['BT']}],
+      [{n:'Roof + Insulation',w:'PM',d:'Metal roof, soffit, утепление',t:['BT']}],
+    ]},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Drywall',w:'PM',d:'Гипсокартон ~25 дн.',t:['BT']}],
+      [{n:'Ext. Paint',w:'Маляры',d:'Покраска фасада',t:['BT']}],
+      [{n:'Shower',w:'Сантехники',d:'Душевые, гидроизоляция',t:['BT']}],
+    ]},
+  ],
+  [
+    {skip:1},
+    {n:'Priming + Garage',w:'PM',d:'Грунтовка, гаражные ворота',t:['BT']},
+    {n:'Flooring / Trim / Doors',w:'PM + subs',d:'Полы, наличники, двери ~30 дн.',t:['BT']},
+    {n:'Tile',w:'Плиточники',d:'Кухня, ванные ~25 дн.',t:['BT']},
+  ],
+  [
+    {skip:1},
+    {n:'Cabinetry + Countertops',w:'PM + subs',d:'Шкафы, столешницы',t:['BT']},
+    {n:'Final MEPs',w:'MEP subs',d:'Финальные подключения ~35 дн.',t:['BT']},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Perm. Power',w:'Duke Energy',d:'Постоянное электро',t:['BT']}],
+      [{n:'Painting',w:'Маляры',d:'Финальная покраска',t:['BT']}],
+      [{n:'Elevator',w:'PM',d:'Если предусмотрен',t:['BT']}],
+    ]},
+  ],
+  [
+    {n:'Закупки (непрерывно)',w:'Алёна + Андрей',d:'Еженедельные встречи по потребностям, заказ материалов',t:['Excel'],flow:'fin'},
+    {skip:1},
+    {n:'Daily logs PM',w:'PM',d:'BT: daily logs, to-do, заметки (заполняется ~5%). После миграции на JT — цель 80%+',t:['BT'],flow:'fin'},
+  ]
+]},
+{name:'8. Фин. контроль',dur:'Весь цикл стройки',who:'Анастасия, Иван',c:'slate', rows:[
+  [
+    {n:'Vendor Invoice',w:'Подрядчик',d:'Заявка на оплату выполненных работ',t:[]},
+    {n:'Проверка scope',w:'Иван',d:'Соответствие договору',t:['Excel','BT']},
+    {n:'Подтверждение PM',w:'PM',d:'Работы выполнены, качество ОК',t:[]},
+    {n:'Оплата BoA',w:'Анастасия',d:'Вручную в Bank of America',t:['BoA']},
+    {n:'Категоризация QB',w:'Иван',d:'По проектам + 5 кредитных карт',t:['QB']},
+  ],
+  [
+    {n:'Сверка бюджет vs факт',w:'Анастасия',d:'Ежемесячно: Excel + QB + BT вручную в 3 системах. После миграции на JT — одна система с QB-интеграцией',t:['Excel','QB','BT'],flow:'fin'},
+    {skip:2},
+    {n:'Отчёты клиентам',w:'Анастасия',d:'Ежемесячно для получения следующего транша',t:['Excel'],flow:'fin'},
+  ]
+]},
+{name:'9. Завершение',dur:'1–2 мес.',who:'PM, Андрей, Артур',c:'emerald', rows:[
+  [
+    {par:true,label:'Параллельно',rows:[
+      [{n:'Touch Ups',w:'PM',d:'Финальная доводка',t:['BT']}],
+      [{n:'Driveway',w:'PM + subs',d:'Подъездная дорога',t:['BT']}],
+      [{n:'Landscaping',w:'PM + subs',d:'Озеленение, дренаж',t:['BT']}],
+    ]},
+    {par:true,label:'Параллельно',rows:[
+      [{n:'MEP Finals',w:'Андрей',d:'Elec/Plumb/Mech/Gas',t:[]}],
+      [{n:'Survey + Cert',w:'Андрей',d:'Elevation Cert, Blower Door',t:[]}],
+    ]},
+    {n:'Final Inspection',w:'Андрей + PM',d:'Building + Zoning ~14 дн.',t:[]},
+    {n:'CO ✓',w:'KH Build',d:'Certificate of Occupancy',t:[],ms:true},
+  ],
+  [
+    {skip:3},
+    {n:'Punch List',w:'PM + клиент',d:'Замечания, warranties, manuals, lien releases',t:[]},
+    {n:'Передача ключей ✓',w:'Артур',d:'Финальные расчёты, документация',t:[],ms:true},
+  ]
+]},
+];
+
+// Counter object passed by reference to keep numbering continuous across rows and parallel blocks
+function countNodes(item) {
+  if (item.skip) return 0;
+  if (item.par) {
+    // Count max nodes across parallel rows (they run in parallel, so share numbers)
+    let max = 0;
+    item.rows.forEach(row => {
+      let c = 0;
+      row.forEach(it => c += countNodes(it));
+      if (c > max) max = c;
+    });
+    return max;
+  }
+  return 1;
+}
+
+function renderNode(item, color, counter) {
+  if (item.skip) return `<div style="width:${item.skip * 154}px;min-width:${item.skip * 154}px"></div>`;
+
+  if (item.par) {
+    let h = `<div class="parallel-block"><div class="par-label">${item.label||'⇅'}</div>`;
+    const baseIdx = counter.idx;
+    item.rows.forEach((row, ri) => {
+      // Each parallel row starts from the same base number
+      const rowCounter = {idx: baseIdx};
+      h += '<div class="par-row">';
+      row.forEach((it, ii) => {
+        if (ii > 0) h += '<div class="arrow-h">→</div>';
+        h += renderNode(it, color, rowCounter);
+      });
+      h += '</div>';
+    });
+    // Advance counter by the max nodes in any parallel row
+    counter.idx = baseIdx + countNodes(item);
+    h += '</div>';
+    return h;
+  }
+
+  counter.idx++;
+  const num = counter.idx;
+  const sysH = item.t && item.t.length ? `<div class="nt">${item.t.map(x=>`<span>${x}</span>`).join('')}</div>` : '';
+  const flowH = item.flow === 'pay' ? '<div class="flow-tag pay">💰 непрерывно</div>' : item.flow === 'fin' ? '<div class="flow-tag fin">🔄 непрерывно</div>' : '';
+  const cls = item.ms ? 'node milestone' : 'node';
+
+  return `<div class="${cls}">
+    <div class="circle" style="background:${colors[color]}">${item.ms ? '<span>✓</span>' : num}</div>
+    <div class="node-text">
+      <div class="nn">${item.n}</div>
+      <div class="nw">${item.w}</div>
+      <div class="nd">${item.d}</div>
+      ${sysH}${flowH}
+    </div>
+  </div>`;
+}
+
+function render() {
+  const wrap = document.getElementById('wrap');
+  let html = '';
+
+  phases.forEach((ph, pi) => {
+    if (pi > 0) {
+      html += `<div class="phase-div"><div class="phase-div-dot">↓</div><div class="phase-div-line"></div></div>`;
+    }
+
+    html += `<div class="phase">`;
+    html += `<div class="phase-label"><div class="pn" style="color:${colors[ph.c]}">${ph.name}</div><div class="pd">${ph.dur}</div><div class="pw">${ph.who}</div></div>`;
+    html += `<div class="phase-content" style="border-left-color:${colors[ph.c]}">`;
+
+    const counter = {idx: 0};
+    ph.rows.forEach(row => {
+      html += '<div class="swim-row">';
+      row.forEach((item, i) => {
+        if (item.skip) {
+          // Each skipped slot = node(130px) + arrow(24px) = 154px
+          html += `<div style="width:${item.skip * 154}px;min-width:${item.skip * 154}px"></div>`;
+        } else {
+          if (i > 0) html += '<div class="arrow-h">→</div>';
+          html += renderNode(item, ph.c, counter);
+        }
+      });
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  wrap.innerHTML = html;
+}
+
+render();
+
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>

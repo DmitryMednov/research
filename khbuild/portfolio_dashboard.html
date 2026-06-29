@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KH Build — Дэшборд портфеля проектов</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('kh-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+:root {
+  --bg:#FFFFFF; --card:#FFFFFF; --surface2:#F5F3EE; --border:#E0DDD3;
+  --text:#1A1A1A; --muted:#6B6A65; --accent:#C9A65D; --accent-strong:#B38F47;
+  --dark-section:#1A1A1A; --on-dark:#F5F3EE;
+  --danger:#C0392B; --success:#1D9E75; --warning:#D4850F; --ai:#6C41D4;
+  --danger-bg:#FCEEEC; --success-bg:#E8F8F0; --warning-bg:#FEF3E0; --ai-bg:#F0ECFE;
+  --danger-text:#8B2818; --warning-text:#8B6914; --success-text:#0F6E56; --ai-text:#4A2B96;
+  --on-accent:#1A1A1A; --shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] {
+  --bg:#141414; --card:#1F1F1F; --surface2:#292826; --border:#38342A;
+  --text:#F5F3EE; --muted:#9A938A; --accent:#C9A65D; --accent-strong:#D9B870;
+  --dark-section:#0B0B0B;
+  --danger:#ef4444; --success:#22c997; --warning:#f59e0b; --ai:#a78bfa;
+  --danger-bg:rgba(239,68,68,0.14); --success-bg:rgba(34,201,151,0.14);
+  --warning-bg:rgba(245,158,11,0.14); --ai-bg:rgba(167,139,250,0.14);
+  --danger-text:#fca5a5; --warning-text:#fcd34d; --success-text:#6ee7b7; --ai-text:#c4b5fd;
+  --on-accent:#141414; --shadow:0 2px 8px rgba(0,0,0,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Montserrat',-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; font-weight:400; }
+.container { max-width:1280px; margin:0 auto; padding:24px; }
+
+.theme-toggle { position:fixed; top:18px; right:18px; z-index:1000; width:42px; height:42px; border-radius:50%;
+  border:2px solid var(--accent); background:var(--dark-section); color:var(--accent);
+  font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.25); transition:transform .2s,background .2s; font-family:inherit; }
+.theme-toggle:hover { transform:scale(1.1); background:var(--accent); color:var(--dark-section); }
+[data-theme="dark"] .theme-toggle__light { display:none; }
+[data-theme="light"] .theme-toggle__dark,:root:not([data-theme="dark"]) .theme-toggle__dark { display:none; }
+
+.header { text-align:center; padding:56px 24px 40px; margin:-24px -24px 40px;
+  background:var(--dark-section); color:var(--on-dark); border-bottom:3px solid var(--accent); }
+.header h1 { font-size:30px; font-weight:700; margin-bottom:10px; color:var(--on-dark); text-transform:uppercase; letter-spacing:1px; }
+.header .subtitle { color:#B8B5AA; font-size:14px; letter-spacing:0.5px; margin-bottom:14px; }
+.header .logo { font-size:24px; letter-spacing:6px; color:var(--accent); margin-bottom:18px; font-weight:800; }
+.header .back { display:inline-block; color:var(--accent); text-decoration:none; font-size:12px; letter-spacing:0.5px; border:1px solid var(--accent); padding:6px 14px; border-radius:4px; }
+.header .back:hover { background:var(--accent); color:var(--dark-section); }
+
+.section-title { font-size:20px; font-weight:700; margin:36px 0 14px; padding-bottom:8px; border-bottom:2px solid var(--accent); text-transform:uppercase; letter-spacing:1px; }
+.section-desc { color:var(--muted); font-size:13px; margin-bottom:18px; }
+
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:4px; padding:16px 20px; text-align:center; box-shadow:var(--shadow); }
+.kpi .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; font-weight:600; }
+.kpi .value { font-size:26px; font-weight:700; }
+.kpi .note { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi.success .value { color:var(--success); }
+.kpi.warning .value { color:var(--warning); }
+.kpi.danger .value { color:var(--danger); }
+.kpi.accent .value { color:var(--accent); }
+
+.crisis-banner { background:var(--danger-bg); border:1px solid var(--danger); border-left:5px solid var(--danger); border-radius:4px; padding:18px 22px; margin-bottom:24px; box-shadow:var(--shadow); }
+.crisis-banner .cb-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--danger-text); margin-bottom:10px; }
+.crisis-banner ul { margin-left:20px; font-size:13px; line-height:1.7; }
+.crisis-banner ul li { margin-bottom:6px; }
+.crisis-banner strong { color:var(--danger-text); }
+
+.pain-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; margin-bottom:24px; }
+.pain-card { border-radius:4px; padding:16px 18px; box-shadow:var(--shadow); border:1px solid var(--border); }
+.pain-card.red { background:var(--danger-bg); border-color:var(--danger); border-left:4px solid var(--danger); }
+.pain-card.yellow { background:var(--warning-bg); border-color:var(--warning); border-left:4px solid var(--warning); }
+.pain-card.green { background:var(--success-bg); border-color:var(--success); border-left:4px solid var(--success); }
+.pain-card .pc-cat { font-size:10px; text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:6px; }
+.pain-card.red .pc-cat { color:var(--danger-text); }
+.pain-card.yellow .pc-cat { color:var(--warning-text); }
+.pain-card.green .pc-cat { color:var(--success-text); }
+.pain-card h3 { font-size:14px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+.pain-card p, .pain-card ul { font-size:12px; line-height:1.6; }
+.pain-card ul { margin-left:16px; }
+.pain-card ul li { margin-bottom:4px; }
+
+.table-wrap { overflow-x:auto; background:var(--card); border:1px solid var(--border); border-radius:4px; box-shadow:var(--shadow); margin-bottom:24px; }
+table.data { width:100%; border-collapse:collapse; font-size:12px; }
+table.data thead th { background:var(--surface2); padding:10px 8px; text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; color:var(--muted); border-bottom:2px solid var(--border); white-space:nowrap; }
+table.data thead th.num, table.data td.num { text-align:right; font-variant-numeric:tabular-nums; }
+table.data tbody td { padding:9px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+table.data tbody tr:last-child td { border-bottom:none; }
+table.data tbody tr:hover { background:var(--surface2); }
+table.data .tot td { background:var(--surface2); font-weight:700; border-top:2px solid var(--accent); }
+table.data .status { display:inline-block; padding:2px 8px; border-radius:3px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; }
+table.data .status.active { background:var(--success-bg); color:var(--success-text); }
+table.data .status.arch { background:var(--warning-bg); color:var(--warning-text); }
+table.data .status.permit { background:var(--danger-bg); color:var(--danger-text); }
+table.data .status.done { background:var(--surface2); color:var(--muted); }
+table.data .cell-danger { color:var(--danger); font-weight:700; }
+table.data .cell-warning { color:var(--warning-text); font-weight:600; }
+table.data .cell-success { color:var(--success-text); }
+
+.cashflow-row { display:grid; grid-template-columns:100px 1fr 120px 90px; gap:10px; align-items:center; padding:8px 12px; border-bottom:1px solid var(--border); font-size:12px; }
+.cashflow-row:last-child { border-bottom:none; }
+.cashflow-row .mo { font-weight:700; color:var(--muted); letter-spacing:0.5px; }
+.cashflow-row .bar-wrap { background:var(--surface2); height:14px; border-radius:2px; overflow:hidden; position:relative; }
+.cashflow-row .bar { height:100%; background:var(--accent); border-radius:2px; }
+.cashflow-row .bar.low { background:var(--danger); }
+.cashflow-row .bar.mid { background:var(--warning); }
+.cashflow-row .bar.high { background:var(--success); }
+.cashflow-row .amt { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+.cashflow-row .runway { text-align:right; font-size:10px; color:var(--muted); }
+
+.footer { text-align:center; padding:32px 24px; margin:48px -24px -24px; color:var(--on-dark); font-size:12px; letter-spacing:0.5px; background:var(--dark-section); border-top:3px solid var(--accent); }
+
+@media (max-width: 768px) {
+  .container { padding:14px; }
+  .header { padding:32px 16px 24px; margin:-14px -14px 24px; }
+  .header h1 { font-size:20px; letter-spacing:0.5px; }
+  .header .subtitle { font-size:11px; }
+  .header .logo { font-size:18px; letter-spacing:4px; margin-bottom:12px; }
+  .section-title { font-size:16px; margin:28px 0 10px; }
+  .kpi-grid { grid-template-columns:1fr 1fr; gap:8px; }
+  .kpi { padding:12px 14px; }
+  .kpi .value { font-size:20px; }
+  .pain-grid { grid-template-columns:1fr; }
+  .cashflow-row { grid-template-columns:64px 1fr 90px; }
+  .cashflow-row .runway { display:none; }
+  table.data { font-size:11px; }
+  table.data thead th, table.data tbody td { padding:7px 6px; }
+  .theme-toggle { top:10px; right:10px; width:36px; height:36px; font-size:15px; }
+  .footer { padding:20px 16px; margin:32px -14px -14px; font-size:10px; }
+}
+@media (max-width: 420px) { .kpi-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Переключить тему">
+  <span class="theme-toggle__light">🌙</span>
+  <span class="theme-toggle__dark">☀</span>
+</button>
+
+<div class="container">
+
+<div class="header">
+  <div class="logo">KH BUILD</div>
+  <h1>Дэшборд портфеля проектов</h1>
+  <div class="subtitle">Snapshot 16 апреля 2026 · cash, burn, pipeline и болевые точки</div>
+  <a class="back" href="index.html">← Назад на главную</a>
+</div>
+
+<!-- CRISIS BANNER — top of dashboard -->
+<div class="crisis-banner">
+  <div class="cb-title">🚨 Crisis check — что болит прямо сейчас</div>
+  <ul>
+    <li><strong>Runway тонкий:</strong> в кассе <strong>$68.8K</strong>, фиксированный burn ~<strong>$61.2K/мес</strong>. Если завтра встанут все поступления — <strong>~1.1 месяца</strong> до нуля.</li>
+    <li><strong>4 проекта застряли</strong> в architecture/permitting (не приносят выручку, но потребляют внимание): Kerry Iseghem $240K, Karen Hantman $135K, Victor Tonas $200K, Jason #1 $3.5K. Всего заморожено <strong>$578.5K</strong> потенциала.</li>
+    <li><strong>Выручка от "старых" проектов заканчивается</strong>: Bath Club — <strong>июль 26</strong>, 7840 3rd — сен 26, остальные активные — окт 26. Если новые не стартуют до Q3 — провал Q4.</li>
+    <li><strong>Cost/revenue ratio</strong> через Q3 2026 держится на <strong>39-55%</strong> — маржа под давлением до марта 2027, когда ratio впервые преодолеет 1.0 (расходы больше доходов).</li>
+  </ul>
+  <div style="margin-top:12px; font-size:12px; color:var(--danger-text);">
+    Эта страница — про <strong>основной GC-портфель</strong> (14 проектов, fee-based). Инвойсы подрядчиков и кредитные линии по отдельным объектам (ABC) — в <a href="abc_projects.html" style="color:var(--danger-text); font-weight:700;">ABC Projects 🔒</a> (закрытый раздел, по паролю). Воронка новых сделок — в <a href="sales_dashboard.html" style="color:var(--danger-text); font-weight:700;">Дэшборде продаж →</a>.
+  </div>
+</div>
+
+<!-- KPI -->
+<div class="section-title">Ключевые цифры</div>
+<div class="kpi-grid">
+  <div class="kpi warning">
+    <div class="label">Касса сейчас (APR 26)</div>
+    <div class="value">$68.8K</div>
+    <div class="note">1.1 мес фикс. расходов</div>
+  </div>
+  <div class="kpi success">
+    <div class="label">Касса на конец 2026 (прогноз)</div>
+    <div class="value">$761K</div>
+    <div class="note">если pipeline едет по плану</div>
+  </div>
+  <div class="kpi danger">
+    <div class="label">Фиксированный burn</div>
+    <div class="value">$61.2K</div>
+    <div class="note">зп + rent + soft + ins + mkt + other</div>
+  </div>
+  <div class="kpi accent">
+    <div class="label">Активных по выручке</div>
+    <div class="value">8</div>
+    <div class="note">+ 1 старт с apr 26 (301 161st)</div>
+  </div>
+  <div class="kpi warning">
+    <div class="label">Замороженные</div>
+    <div class="value">4</div>
+    <div class="note">arch / permitting · $578K fee</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Общий fee pipeline</div>
+    <div class="value">$1.99M</div>
+    <div class="note">все 14 проектов · горизонт до июля 2027</div>
+  </div>
+</div>
+
+<!-- Monthly cashflow -->
+<div class="section-title">Помесячный прогноз кассы</div>
+<div class="section-desc">Остаток на конец месяца (Собственные средства). Красный — касса ниже месячного burn ($61K). Жёлтый — 1-3 мес. Зелёный — &gt;3 мес запаса.</div>
+
+<div class="table-wrap" style="padding:8px 12px;">
+  <div class="cashflow-row" style="font-weight:700; background:var(--surface2); margin:-8px -12px 4px; padding:10px 12px; border-bottom:2px solid var(--accent);">
+    <div class="mo">Месяц</div>
+    <div>Остаток</div>
+    <div class="amt">USD</div>
+    <div class="runway">Запас, мес</div>
+  </div>
+  <div class="cashflow-row"><div class="mo">NOV 25</div><div class="bar-wrap"><div class="bar low" style="width:0%"></div></div><div class="amt" style="color:var(--danger)">$0</div><div class="runway">0.0</div></div>
+  <div class="cashflow-row"><div class="mo">DEC 25</div><div class="bar-wrap"><div class="bar mid" style="width:10%"></div></div><div class="amt">$79,006</div><div class="runway">1.3</div></div>
+  <div class="cashflow-row"><div class="mo">JAN 26</div><div class="bar-wrap"><div class="bar low" style="width:4%"></div></div><div class="amt" style="color:var(--danger)">$29,720</div><div class="runway">0.5</div></div>
+  <div class="cashflow-row"><div class="mo">FEB 26</div><div class="bar-wrap"><div class="bar low" style="width:5%"></div></div><div class="amt" style="color:var(--danger)">$41,131</div><div class="runway">0.7</div></div>
+  <div class="cashflow-row"><div class="mo">MAR 26</div><div class="bar-wrap"><div class="bar mid" style="width:8%"></div></div><div class="amt">$66,778</div><div class="runway">1.1</div></div>
+  <div class="cashflow-row"><div class="mo">APR 26</div><div class="bar-wrap"><div class="bar mid" style="width:8%"></div></div><div class="amt" style="color:var(--warning-text); font-weight:700;">$68,828</div><div class="runway">1.1</div></div>
+  <div class="cashflow-row"><div class="mo">MAY 26</div><div class="bar-wrap"><div class="bar mid" style="width:14%"></div></div><div class="amt">$116,991</div><div class="runway">1.9</div></div>
+  <div class="cashflow-row"><div class="mo">JUN 26</div><div class="bar-wrap"><div class="bar high" style="width:29%"></div></div><div class="amt">$237,586</div><div class="runway">3.9</div></div>
+  <div class="cashflow-row"><div class="mo">JUL 26</div><div class="bar-wrap"><div class="bar high" style="width:45%"></div></div><div class="amt">$367,077</div><div class="runway">6.0</div></div>
+  <div class="cashflow-row"><div class="mo">AUG 26</div><div class="bar-wrap"><div class="bar high" style="width:55%"></div></div><div class="amt">$454,642</div><div class="runway">7.4</div></div>
+  <div class="cashflow-row"><div class="mo">SEP 26</div><div class="bar-wrap"><div class="bar high" style="width:66%"></div></div><div class="amt">$539,142</div><div class="runway">8.8</div></div>
+  <div class="cashflow-row"><div class="mo">OCT 26</div><div class="bar-wrap"><div class="bar high" style="width:78%"></div></div><div class="amt">$633,569</div><div class="runway">10.3</div></div>
+  <div class="cashflow-row"><div class="mo">NOV 26</div><div class="bar-wrap"><div class="bar high" style="width:87%"></div></div><div class="amt">$710,270</div><div class="runway">11.6</div></div>
+  <div class="cashflow-row"><div class="mo">DEC 26</div><div class="bar-wrap"><div class="bar high" style="width:93%"></div></div><div class="amt">$761,295</div><div class="runway">12.4</div></div>
+  <div class="cashflow-row"><div class="mo">JAN 27</div><div class="bar-wrap"><div class="bar high" style="width:96%"></div></div><div class="amt">$789,624</div><div class="runway">12.9</div></div>
+  <div class="cashflow-row"><div class="mo">MAR 27</div><div class="bar-wrap"><div class="bar high" style="width:100%"></div></div><div class="amt">$817,943</div><div class="runway">13.4</div></div>
+  <div class="cashflow-row"><div class="mo">JUL 27</div><div class="bar-wrap"><div class="bar high" style="width:91%"></div></div><div class="amt">$740,748</div><div class="runway">12.1</div></div>
+</div>
+
+<!-- Projects portfolio -->
+<div class="section-title">Портфель проектов · 14 сделок</div>
+<div class="section-desc">Статус, total fee, окно выручки. <span style="color:var(--danger-text); font-weight:700;">Красный</span> — permitting stuck. <span style="color:var(--warning-text); font-weight:700;">Жёлтый</span> — architecture (не приносит выручку). <span style="color:var(--success-text); font-weight:700;">Зелёный</span> — активный в поле.</div>
+
+<div class="table-wrap">
+<table class="data">
+  <thead>
+    <tr>
+      <th>#</th><th>Проект</th><th>Клиент</th><th>Статус</th>
+      <th class="num">Total fee</th><th>Старт выручки</th><th>Конец выручки</th><th>Комментарий</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>1919 Arrowhead</td><td>Erica Cavanaugh</td><td><span class="status active">Active</span></td><td class="num">$118,968</td><td>FEB 26</td><td>OCT 26</td><td class="cell-warning">Завершение Q4 26</td></tr>
+    <tr><td>2</td><td>408 161st</td><td>Matthew Caldwell</td><td><span class="status active">Active</span></td><td class="num">$102,467</td><td>FEB 26</td><td>OCT 26</td><td class="cell-warning">Завершение Q4 26</td></tr>
+    <tr><td>3</td><td>428 Bath Club</td><td>Carie Randesi</td><td><span class="status active">Active</span></td><td class="num">$141,079</td><td>JAN 26</td><td>JUL 26</td><td class="cell-danger">⚠ заканчивается первым — июль</td></tr>
+    <tr><td>4</td><td>586 182nd</td><td>Candice Bray</td><td><span class="status active">Active</span></td><td class="num">$157,972</td><td>JAN 26</td><td>OCT 26</td><td class="cell-warning">Завершение Q4 26</td></tr>
+    <tr><td>5</td><td>7840 3rd</td><td>Craig Dean</td><td><span class="status active">Active</span></td><td class="num">$203,201</td><td>NOV 25</td><td>SEP 26</td><td class="cell-warning">Большой чек, близко к концу</td></tr>
+    <tr><td>6</td><td>734 Placido Way</td><td>Dan Rab</td><td><span class="status active">Active</span></td><td class="num">$164,765</td><td>FEB 26</td><td>OCT 26</td><td>Стабильный профиль</td></tr>
+    <tr><td>7</td><td>256 Bayside</td><td>Ronald Walters</td><td><span class="status active">Active</span></td><td class="num">$202,813</td><td>JAN 26</td><td>JAN 27</td><td class="cell-success">Тянет в 2027</td></tr>
+    <tr><td>8</td><td>340 Boca Ciega</td><td>Marsha Buckley</td><td><span class="status active">Active</span></td><td class="num">$110,384</td><td>APR 26</td><td>FEB 27</td><td class="cell-success">Новый, тянет в 2027</td></tr>
+    <tr><td>9</td><td>15500 2nd St</td><td>Jason Matthews</td><td><span class="status permit">Permitting</span></td><td class="num">$3,500</td><td>—</td><td>—</td><td class="cell-danger">⚠ застрял · permit fees не оплачены</td></tr>
+    <tr><td>10</td><td>16112 Redington Dr</td><td>Jason Matthews</td><td><span class="status active">Active</span></td><td class="num">$60,000</td><td>APR 26</td><td>JAN 27</td><td>Небольшой, но ровный</td></tr>
+    <tr><td>11</td><td>11410 1st St</td><td>Kerry Iseghem</td><td><span class="status arch">Architecture</span></td><td class="num">$240,000</td><td>JUN 26</td><td>MAR 27</td><td class="cell-warning">Крупнейший в pipeline — критично запустить</td></tr>
+    <tr><td>12</td><td>5118 31st Ave S <span style="font-size:9px; background:var(--success-bg); color:var(--success-text); padding:1px 5px; border-radius:3px; font-weight:700; letter-spacing:0.3px;">← воронка</span></td><td>Karen Hantman</td><td><span class="status arch">Architecture</span></td><td class="num">$135,000</td><td>OCT 26</td><td>JUN 27</td><td class="cell-warning">Только что из <a href="sales_dashboard.html" style="color:var(--warning-text); font-weight:700;">воронки</a>, старт через 6 мес</td></tr>
+    <tr><td>13</td><td>301 161st Ave <span style="font-size:9px; background:var(--success-bg); color:var(--success-text); padding:1px 5px; border-radius:3px; font-weight:700; letter-spacing:0.3px;">← воронка</span></td><td>Jason Matthews</td><td><span class="status active">Starting</span></td><td class="num">$150,000</td><td>MAY 26</td><td>JAN 27</td><td>Jason #1 (был «signed на паузе»), первая оплата в мае</td></tr>
+    <tr><td>14</td><td>1807 Pass A Grille Way <span style="font-size:9px; background:var(--success-bg); color:var(--success-text); padding:1px 5px; border-radius:3px; font-weight:700; letter-spacing:0.3px;">← воронка</span></td><td>Victor Tonas</td><td><span class="status arch">Architecture</span></td><td class="num">$200,000</td><td>OCT 26</td><td>JUL 27</td><td class="cell-warning">Только что из <a href="sales_dashboard.html" style="color:var(--warning-text); font-weight:700;">воронки</a>, долгий старт</td></tr>
+    <tr class="tot"><td></td><td colspan="3">TOTAL PIPELINE</td><td class="num">$1,990,148</td><td colspan="3">Горизонт: Nov 25 → Jul 27</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Fixed burn detail -->
+<div class="section-title">Месячный burn — из чего состоит</div>
+<div class="section-desc">Типовой месячный расход от MAY 2026 (плановый стационар). Апрель ниже типового за счёт разового маркетинга.</div>
+
+<div class="table-wrap">
+<table class="data">
+  <thead><tr><th>Статья</th><th class="num">USD / мес</th><th class="num">% от burn</th><th>Комментарий</th></tr></thead>
+  <tbody>
+    <tr><td>Зарплата</td><td class="num">$51,294</td><td class="num">83.8%</td><td class="cell-danger">Главный рычаг оптимизации</td></tr>
+    <tr><td>Insurances</td><td class="num">$3,304</td><td class="num">5.4%</td><td>Strаховки (GL, workers comp)</td></tr>
+    <tr><td>Rent</td><td class="num">$2,163</td><td class="num">3.5%</td><td>Офис Tampa Bay</td></tr>
+    <tr><td>Other</td><td class="num">$2,000</td><td class="num">3.3%</td><td>Мелкие операционные</td></tr>
+    <tr><td>Software</td><td class="num">$1,454</td><td class="num">2.4%</td><td>BT + GHL + подписки (JT добавит ~$500)</td></tr>
+    <tr><td>Marketing</td><td class="num">$1,000</td><td class="num">1.6%</td><td>Базовый (FB ads $50/день отдельно)</td></tr>
+    <tr class="tot"><td>ИТОГО фикс. burn</td><td class="num">$61,214</td><td class="num">100%</td><td>≈ точка безубыточности по GC fee</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- PAIN POINTS — crisis management lens -->
+<div class="section-title">Больные места — что лечим в первую очередь</div>
+<div class="section-desc">Приоритизация через призму кризис-менеджмента: cash is king → защита runway → возврат к росту. Без сентиментов и украшательств.</div>
+
+<div class="pain-grid">
+
+  <div class="pain-card red">
+    <div class="pc-cat">🔴 P0 · Немедленно</div>
+    <h3>Разморозить Architecture / Permitting</h3>
+    <p style="margin-bottom:8px;">Четыре проекта на $578.5K fee не двигаются. Ни рубля выручки, но внимание менеджеров потребляют.</p>
+    <ul>
+      <li>Jason #1 (15500 2nd St) — personally permit-fee payment, deadline был 31 мар</li>
+      <li>Kerry Iseghem — архитектор обещал чертежи, стартовая оплата к <strong>June 26</strong></li>
+      <li>Karen Hantman — оплата только $5K, остальное с октября</li>
+      <li>Victor Tonas — архитектура, старт по плану октябрь 26</li>
+    </ul>
+    <p style="margin-top:8px;"><strong>Действие:</strong> еженедельный статус-звонок с каждым из 4 клиентов до выхода на оплату.</p>
+  </div>
+
+  <div class="pain-card red">
+    <div class="pc-cat">🔴 P0 · Cash cushion</div>
+    <h3>Тонкий runway до MAY 2026</h3>
+    <p style="margin-bottom:8px;">APR 2026: $68.8K в банке = 1.1 мес фикс. burn. До мая любой непредвиденный расход (суд, страховка, больничный ключевого PM) — угроза.</p>
+    <ul>
+      <li>Накопить buffer <strong>$120K</strong> (2 мес burn) к концу Q2</li>
+      <li>Отложить capex / найм до Q3 2026</li>
+      <li>Открыть кредитную линию заранее, пока показатели допускают</li>
+    </ul>
+  </div>
+
+  <div class="pain-card yellow">
+    <div class="pc-cat">🟡 P1 · Концентрация</div>
+    <h3>Выручка заканчивается одновременно</h3>
+    <p style="margin-bottom:8px;">Bath Club — июль 2026. 7840 3rd — сен 26. Ещё 4 проекта — окт 26. Если не подхватим новыми — Q4 2026 проваливается в минус по GC fee.</p>
+    <ul>
+      <li>Критично: 11410 1st St (Kerry) должен стартовать <strong>JUN 26</strong></li>
+      <li>Новые sales leads из <a href="sales_dashboard.html" style="color:var(--warning-text); font-weight:700;">воронки</a> — <strong>+2 подписания</strong> к сентябрю</li>
+      <li>Средняя длительность проекта ≈ 8 мес → сделки закрывать <strong>сейчас</strong> на H2 2026</li>
+    </ul>
+  </div>
+
+  <div class="pain-card yellow">
+    <div class="pc-cat">🟡 P1 · Концентрация клиентов</div>
+    <h3>Jason Matthews — 3 из 14 проектов</h3>
+    <p style="margin-bottom:8px;">15500 2nd St + 16112 Redington + 301 161st Ave = $213.5K fee у одного клиента. Если отношения ухудшатся — теряем сразу 10.7% pipeline.</p>
+    <ul>
+      <li>Укреплять сервис (единая точка контакта, SLA по связи)</li>
+      <li>Не предлагать условия, ущемляющие другие сделки</li>
+      <li>Диверсифицировать воронку в следующих 90 днях</li>
+    </ul>
+  </div>
+
+  <div class="pain-card yellow">
+    <div class="pc-cat">🟡 P1 · Cost pressure</div>
+    <h3>Маржа в H1 2026 на пределе</h3>
+    <p style="margin-bottom:8px;">Cost/revenue (fix burn / GC fee) в MAY-JUN 26 ≈ 34%, но в SEP 26 поднимается до 39% (Bath Club выпадает). Без новых проектов Q4 будет ratio &gt;60%.</p>
+    <ul>
+      <li>Удержать зарплатный burn — <strong>без найма</strong> до Q3 2026</li>
+      <li>Контроль месячного зарплатного фонда — отдельно у финансового директора</li>
+      <li>Маркетинг-бюджет держать дисциплинированно ($50/день FB, без скачков)</li>
+    </ul>
+  </div>
+
+  <div class="pain-card green">
+    <div class="pc-cat">🟢 Plus · Опора</div>
+    <h3>Что работает и защищает</h3>
+    <ul>
+      <li><strong>256 Bayside и 340 Boca Ciega</strong> — выручка тянется в 2027, дают нижнюю подушку</li>
+      <li>Собственные средства растут непрерывно с DEC 2025</li>
+      <li>Total pipeline $1.99M — достаточная глубина на 18 мес</li>
+      <li>Коэффициент &gt;1.0 с марта 2027 — системный выход из кризисной фазы</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Crisis playbook -->
+<div class="section-title">Crisis playbook — 30/60/90 дней</div>
+<div class="section-desc">Что делаем, чтобы пройти Q2-Q3 2026 без разрывов.</div>
+
+<div class="pain-grid">
+  <div class="pain-card red">
+    <div class="pc-cat">30 дней (до 22 мая)</div>
+    <h3>Защита runway</h3>
+    <ul>
+      <li>Разобрать ситуацию Jason #1 (permit fees) — go / no-go</li>
+      <li>Закрыть оплату от Kerry Iseghem до старта JUN</li>
+      <li>Не брать новых обязательств по найму / сервисам</li>
+      <li>Проверить и подтвердить все AR (что реально придёт в APR-MAY)</li>
+    </ul>
+  </div>
+  <div class="pain-card yellow">
+    <div class="pc-cat">60 дней (до 21 июня)</div>
+    <h3>Восстановление воронки</h3>
+    <ul>
+      <li>Подписать минимум 2 новых проекта на H2 2026</li>
+      <li>Открыть кредитную линию на $100-150K</li>
+      <li>Запустить работы на 11410 1st St (разморозка)</li>
+      <li>Пересмотреть зарплатную структуру (пример: Metelskiy $8K → $3K)</li>
+    </ul>
+  </div>
+  <div class="pain-card green">
+    <div class="pc-cat">90 дней (до 21 июля)</div>
+    <h3>Возврат к росту</h3>
+    <ul>
+      <li>Buffer cushion $120K накоплен</li>
+      <li>В pipeline 3+ подписания с стартом Q4 26</li>
+      <li>Миграция JT завершена → процессы дают рычаг</li>
+      <li>KPI Q4 2026 согласованы с командой</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  KH Build LLC · Дэшборд портфеля · Источник: KH Build Прогноз от 16 Apr 2026 · Конфиденциально
+</div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  var cur = document.documentElement.getAttribute('data-theme') || 'light';
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('kh-theme', next); } catch(e) {}
+}
+</script>
+<script src="footer.js" defer></script>
+</body>
+</html>
